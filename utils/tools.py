@@ -1,6 +1,7 @@
 import pickle
 import os.path
 
+
 def assignment_parser(s):
     assert s is not None
     s = [i.strip() for i in s.split() if i.strip()]
@@ -34,6 +35,7 @@ def formatter(type_list, s):
         s = [i.strip() for i in s.split() if i.strip()]
     total = len(s)
     idx = 0
+
     def recurrent(tl):
         nonlocal idx
         temp = []
@@ -46,57 +48,63 @@ def formatter(type_list, s):
                 temp.append(element(s[idx]))
                 idx += 1
         return tuple(temp)
+
     res = recurrent(type_list)
     assert idx == len(s)
     return res
 
+
 def save_load(p, obj):
-    '''
+    """
     Save an object if not saved, or load an object if not loaded.
-    If both saved and loaded, update the saved one.
-    :p: path of the saved.
-    :obj: object, the loaded one.
-    '''
+    If both saved and loaded, update the saved one
+    :param p: path of the saved
+    :param obj: object, the loaded one
+    """
     print(f'TM path: {p}')
+    # Noella_v2: may use `is not` instead?
     if p != None:
-        chkdir(os.path.dirname(p)) # os.path.split(p)[0]
+        chkdir(os.path.dirname(p))  # os.path.split(p)[0]
     if p is None:
         print('TM skipping!')
         return obj
     if (obj is not None) and (not os.path.isfile(p)):
         print('TM saving!')
-        pickle.dump(obj, open(p,"wb"))
+        pickle.dump(obj, open(p, "wb"))
         r_obj = obj
     elif (obj is None) and os.path.isfile(p):
         print('TM loading!')
         r_obj = pickle.load(open(p, "rb"))
     elif (obj is not None) and os.path.isfile(p):
         print('TM updating savepoint!')
-        pickle.dump(obj, open(p,"wb"))
+        pickle.dump(obj, open(p, "wb"))
         r_obj = obj
     else:
         print('TM save_load both empty')
         r_obj = False
     return r_obj
 
+
 def chkdir(d):
-    '''
-    Create a directory if not existing.
-    '''
+    """
+    Create a directory if not existing
+    :param d: path
+    """
     if not os.path.isdir(d):
         os.makedirs(d)
         print(f'Created Directory: {d}')
     return
 
+
 def dims_adjust(dims_ls, conf_suffix, single=True, sp_suffix=''):
-    '''
+    """
     Adjust the dims_ls based on conf_suffix
-    :dims_ls: the dimensions of the nanostar
-    :conf_suffix: the suffix describing nanostar's configuration
-    :single: if it's for a single nanostar
-    :sp_suffix: special suffix
-    '''
-    dims_ls = [20,2,7]
+    :param dims_ls: the dimensions of the nanostar
+    :param conf_suffix: the suffix describing nanostar's configuration
+    :param single: if it's for a single nanostar
+    :param sp_suffix: special suffix
+    """
+    dims_ls = [20, 2, 7]
     if conf_suffix.split('_')[0] == '':
         return
     if conf_suffix.split('_')[0] == '-jun':
