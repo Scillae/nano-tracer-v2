@@ -2,9 +2,10 @@ import os
 import pickle
 import os.path
 from models import Strand, Base, TimeMachine
-from utils import assignment_parser
-from utils.tools import save_load as SL
-from utils.tools import nextline, formatter
+from utils import assignment_parser, save_load as SL, nextline, formatter
+# Noella: expose inner functions by __init__.py
+# from utils.tools import save_load as SL
+# from utils.tools import nextline, formatter
 from collections import OrderedDict
 
 number_to_base = {0: 'A', 1: 'G', 2: 'C', 3: 'T'}
@@ -19,7 +20,12 @@ class Reader:
     Input topology and configuration file, return a list of Strand
     """
 
-    def __init__(self, top_file, traj_file):
+    def __init__(self, top_file: str, traj_file: str):
+        """
+        init reader with data file paths
+        :param top_file: path to top file
+        :param traj_file: path to traj file
+        """
         self.top_cursor = open(top_file)
         self.traj_cursor = open(traj_file)
         self.format = {
@@ -37,7 +43,11 @@ class Reader:
         self.timestamp = -1
         self.time_machine = None
 
-    def read_single_strand(self):
+    def read_single_strand(self) -> int:
+        """
+        read one strand to self.strands
+        :return: status code, where -1 and -2 indicate line missing from traj and top file respectively, otherwise presents the base amount.
+        """
         # initialize strand
         strand = None
 
@@ -92,6 +102,10 @@ class Reader:
         return base_incre
 
     def read_data(self):
+        """
+        read all strands in specified files
+        :return:
+        """
         self.time_machine = TimeMachine()
         res = self.read_single_strand()
         while res != -1:

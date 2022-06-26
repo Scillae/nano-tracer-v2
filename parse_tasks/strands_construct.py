@@ -1,4 +1,6 @@
-from infra.Reader import Reader
+from infra import Reader
+from utils import SL_result_catch
+
 
 def strands_construct(data, top_path, traj_path):
     varname = 'strands'
