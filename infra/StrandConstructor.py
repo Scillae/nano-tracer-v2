@@ -1,11 +1,9 @@
 import os
 import pickle
 import os.path
-from models import Strand, Base, TimeMachine
-from utils import assignment_parser, save_load as SL, nextline, formatter
-# Noella: expose inner functions by __init__.py
-# from utils.tools import save_load as SL
-# from utils.tools import nextline, formatter
+from models import Strand, Base
+from infra import TimeSeries
+from utils import assignment_parser as nextline, formatter
 from collections import OrderedDict
 
 number_to_base = {0: 'A', 1: 'G', 2: 'C', 3: 'T'}
@@ -15,9 +13,10 @@ base_to_number = {'A': 0, 'a': 0, 'G': 1, 'g': 1,
                   'U': 3, 'u': 3, 'D': 4}
 
 
-class Reader:
+class StrandConstructor:
     """
-    Input topology and configuration file, return a list of Strand
+    Input topology and configuration file, return a time series of Strands
+    This Constructor is currently INCOMPATIBLE with RNA!
     """
 
     def __init__(self, top_file: str, traj_file: str):
@@ -41,7 +40,7 @@ class Reader:
         }
         self.strands = OrderedDict()
         self.timestamp = -1
-        self.time_machine = None
+        self.time_series = None
 
     def read_single_strand(self) -> int:
         """
@@ -101,12 +100,12 @@ class Reader:
 
         return base_incre
 
-    def read_data(self):
+    def read_data(self)-> TimeSeries:
         """
         read all strands in specified files
         :return:
         """
-        self.time_machine = TimeMachine()
+        self.time_series = TimeSeries()
         res = self.read_single_strand()
         while res != -1:
             if res == -2:
@@ -118,7 +117,7 @@ class Reader:
                     od = OrderedDict(base_seq_r_ls)
                     strands_r[strand_id] = Strand(strand_id, od)
                 self.strands = strands_r
-                self.time_machine.add_strands(self.timestamp, self.strands)
+                self.time_series[self.timestamp] =  self.strands
                 self.strands = OrderedDict()
             else:
                 print(f'  Strands: {len(self.strands)}, timestamp: {list(self.strands.values())[0].timestamp}')
@@ -127,8 +126,5 @@ class Reader:
                         f'    id: {i.strand_id}, base_count: {len(i.base_sequence)}')
             res = self.read_single_strand()
         print('Reach end of file.')
-        print(f'Total time series length: {len(self.time_machine.timeseries)}')
-        self.time_machine = self.save_load(p, self.time_machine)
-        # test_strand = self.time_machine.get_strand_by_time(1, 0)
-        # print(test_strand.base_sequence.get(0).__dict__)
-        return self.time_machine
+        print(f'Total time series length: {len(self.time_series)}')
+        return self.time_series

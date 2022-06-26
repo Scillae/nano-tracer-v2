@@ -1,4 +1,5 @@
-from models import Strand, Base, NanoStar, NanoMesh, Arm, TimeMachine
+from models import Strand, Base, NanoStar, NanoMesh, Arm
+from infra import TimeSeries
 from collections import OrderedDict
 from utils import save_load as SL
 import numpy as np
@@ -8,31 +9,29 @@ import os.path
 
 
 class NanoConstructor:
-    def __init__(self, strands_tm, dims_ls, arm_num):
+    def __init__(self, strands_series, ns_dims, arm_num):
         """
-        init NanoStar?
-        :param strands_tm:
-        :param dims_ls:
-        :param arm_num:
+        init NanoStar TimeSeries Constructor
+        :param strands_series: TimeSeries of strands used to construct nanostar series
+        :param ns_dims: topological dimensions of the nanostar to be constructed, [len_arm, len_cen, len_end]
+        :param arm_num: how many arms the nanostar has
         """
-        self.time_machine = None
+        self.time_series = None
         self.strands = strands_series
-        self.dim = dims_ls
-        self.strands = strands_tm
-        self.arm_num = arm_num  # nanomesh not using this.
+        self.dim = ns_dims
+        self.arm_number = arm_number  # nanomesh not using this.
         # expansion site for nanomesh - nanostars in network - as a branch in self.construct()
 
 
     def construct(self, box_dim=None):  # box_dim hacking
         """
-        construct TimeMachine
-        :param box_dim:
-        :return: time machine
+        construct TimeSeries of nanostars (can be branched to create other objects)
+        :param box_dim: size of the simulation box, required if performing periodic boundary condition correction
+        :return: nanostar series
         """
-        self.time_machine = TimeMachine()
-        self.time_machine.box_dim = box_dim  # box_dim. A hacking solution.
+        self.time_series = TimeSeries(box_dim=self.strands.params['box_dim'], ns_dims=self.dim, arm_number= self.arm_number)
 
-        for t_stamp in self.strands.timeseries:
-            ns = NanoStar(self.strands.time_capsule[t_stamp], self.dim, self.arm_num, box_dim=box_dim)
-            self.time_machine.add_instance(t_stamp, ns)
-        return self.time_machine
+        for t_stamp in self.strands:
+            ns = NanoStar(self.strands[t_stamp], self.dim, self.arm_number, box_dim=box_dim)
+            self.time_series[t_stamp] = ns
+        return self.time_series
