@@ -1,12 +1,10 @@
 from collections import OrderedDict
 
-from models import TimeSeries
-
 
 class Strand:
-    def __init__(self, strand_id:int, base_seq:OrderedDict=None, timestamp:int=None):
+    def __init__(self, strand_id: int, base_seq: OrderedDict = None, timestamp: int = None):
         """
-        Strand is a series of bases(nucleotides). Whether the bases are paired remain unknown.
+        Strand is a series of bases(nucleotides). Whether the bases are paired remain unknown
         :param strand_id: id of this strand
         :param base_seq: the series of bases
         :param timestamp: at what time the strand instance appears (for debug use)
@@ -22,8 +20,3 @@ class Strand:
         :return:
         """
         self.base_sequence[base_entity.base_id] = base_entity
-
-    @staticmethod
-    def parse(s):
-        pass
-

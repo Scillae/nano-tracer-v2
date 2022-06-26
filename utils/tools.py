@@ -1,3 +1,4 @@
+import numpy as np
 import pickle
 import os.path
 
@@ -111,6 +112,7 @@ def dims_adjust(ns_dims, conf_suffix, single=True, sp_suffix=''):
         ns_dims[1] = int(conf_suffix.split('_')[1])
     else:
         raise Exception("Unknown Conformation Suffix!")
+
 
 def dist(t1, t2):
     return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))

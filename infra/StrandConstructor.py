@@ -3,7 +3,7 @@ import pickle
 import os.path
 from models import Strand, Base
 from infra import TimeSeries
-from utils import assignment_parser as nextline, formatter
+from utils import assignment_parser, nextline, formatter
 from collections import OrderedDict
 
 number_to_base = {0: 'A', 1: 'G', 2: 'C', 3: 'T'}
@@ -100,7 +100,7 @@ class StrandConstructor:
 
         return base_incre
 
-    def read_data(self)-> TimeSeries:
+    def read_data(self) -> TimeSeries:
         """
         read all strands in specified files
         :return:
@@ -117,7 +117,7 @@ class StrandConstructor:
                     od = OrderedDict(base_seq_r_ls)
                     strands_r[strand_id] = Strand(strand_id, od)
                 self.strands = strands_r
-                self.time_series[self.timestamp] =  self.strands
+                self.time_series[self.timestamp] = self.strands
                 self.strands = OrderedDict()
             else:
                 print(f'  Strands: {len(self.strands)}, timestamp: {list(self.strands.values())[0].timestamp}')

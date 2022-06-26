@@ -1,3 +1,5 @@
+from typing import Optional
+
 from models import Strand, Base, Arm
 from utils.tools import dist
 from collections import OrderedDict
@@ -6,7 +8,7 @@ import copy
 
 
 class NanoStar:
-    def __init__(self, strands:dict, ns_dims:list, arm_num:int, box_dim=None):  # box_dim hacking
+    def __init__(self, strands: dict, ns_dims: list, arm_num: int, box_dim=None):  # box_dim hacking
         """
         init NanoStar
         :param strands: all strands used to construct the nanostar instance
@@ -18,12 +20,12 @@ class NanoStar:
         strands_editing = copy.deepcopy(strands)  # avoid modification to the ref var.
         self.strands = strands
         self.arms = self.binding(strands_editing, ns_dims, box_dim)
-        self.center = self.center_gen(self.strands_editing,
+        self.center = self.center_gen(strands_editing,
                                       ns_dims)  # PBCC performed in self.binding, so self.center must goes afterwards. Also, 'strands' is modified by self.binding, so use self.strands here.
         self.box_dim = box_dim
         self.dims = ns_dims
 
-    def center_gen(self, strands:dict, ns_dims:list) -> dict:
+    def center_gen(self, strands: dict, ns_dims: list) -> dict:
         """
         identify the center of strands
         :param strands: all strands
@@ -42,7 +44,7 @@ class NanoStar:
             st += 1
         return central_bases
 
-    def binding(self, strands:dict, ns_dims:list, box_dim) -> dict:
+    def binding(self, strands: dict, ns_dims: list, box_dim) -> dict:
         """
         bind strands to form arms
         :param strands: all strands
@@ -55,7 +57,7 @@ class NanoStar:
         s0 = strands[min(strand_id_idx)]
         # pool all bases with their locations # now only binding points
         strand_id_idx, strands, bind_base = self.pairing_single_step(strand_id_idx, strands, s0, box_dim,
-                                                                         ns_dims, True)
+                                                                     ns_dims, True)
         # construct arm
         s1 = strands[bind_base.strand_id]
         arm_idx = 0
@@ -66,16 +68,16 @@ class NanoStar:
             s0 = s1  # deepcopy?
             strand_id_idx.remove(s0.strand_id)
             strand_id_idx, strands, bind_base = self.pairing_single_step(strand_id_idx, strands, s0, box_dim,
-                                                                             ns_dims, False)
+                                                                         ns_dims, False)
             s1 = strands[bind_base.strand_id]
             arm_idx += 1
             arms[arm_idx] = Arm(arm_idx, ns_dims, s0.strand_id, {s0.strand_id: s0, s1.strand_id: s1})
             del strands[s0.strand_id]
         return arms
 
-    def periodic_box_cond_correction(self, bind_base, strands:dict, box_dim):
+    def periodic_box_cond_correction(self, bind_base, strands: dict, box_dim):
         """
-        Perform Periodic Box Condition Correction near a given base. The PBCC algorithm is similar to that implemented by oxView.
+        Perform Periodic Box Condition Correction near a given base. The PBCC algorithm is similar to that implemented by oxView
         :param bind_base: the binding site of a strand for pairing two strands
         :param strands: all strands
         :param box_dim: size of the simulation box
@@ -88,7 +90,7 @@ class NanoStar:
         # dis_arr = np.array([dist(bind_base.position, base.position) if base is not bind_base else None for base in pool_base_ls])
         # dis_arr = dis_arr[dis_arr != np.array(None)]
         # assert all(dis_arr > 4) # confirming diffused strand: all greater than 5 (empirical value, binding:1~3)
-        
+
         # PBC-CoM Centering # no need for base_cnt since scaling sine and cosine simultaneously does not change the angle.
         phasors = np.zeros((2, 3))  # NOT normalized to 1. Instead, noted in sines/cosines
         for strand in strands.values():
@@ -155,11 +157,10 @@ class NanoStar:
                     np.array(list(strands[idx].base_sequence.values())[
                                  -1 - ns_dims[2] - ns_dims[0] // binding_location].position),
                     CoM_pos) > criteria else None for idx in strand_id_idx]  # distances from binding point to the CoM
-            bp_ls.extend([list(strands[idx].base_sequence.values())[
-                              ns_dims[2] + ns_dims[0] // binding_location] if dist(np.array(
-                list(strands[idx].base_sequence.values())[ns_dims[2] + ns_dims[0] // binding_location].position),
-                CoM_pos) > criteria else None for idx
-                          in strand_id_idx])
+            bp_ls.extend([
+                list(strands[idx].base_sequence.values())[ns_dims[2] + ns_dims[0] // binding_location] if dist(np.array(
+                    list(strands[idx].base_sequence.values())[ns_dims[2] + ns_dims[0] // binding_location].position),
+                    CoM_pos) > criteria else None for idx in strand_id_idx])
             if any(bp is not None for bp in bp_ls):
                 for base in bp_ls:
                     if base is not None:
@@ -167,8 +168,8 @@ class NanoStar:
                         strands = self.periodic_box_cond_correction(base, strands, box_dim)
                 # recursion
                 strand_id_idx, strands, bind_base = self.pairing_single_step(strand_id_idx, strands, s0,
-                                                                                 box_dim, ns_dims,
-                                                                                 is_checking_pbcc)  # careful -- recursion
+                                                                             box_dim, ns_dims,
+                                                                             is_checking_pbcc)  # careful -- recursion
                 return strand_id_idx, strands, bind_base
         test_length = 3  # adjust if arm is not long enough. direction: center?dedicated to current NS designs.
         test_distance = 4  # paired bases cannot be more than 'test_distance' apart.
@@ -195,18 +196,22 @@ class NanoStar:
             #             strands = self.periodic_box_cond_correction(bind_point_2, pool_base_ls, strands, box_dim)
             #         strand_id_idx, strands, bind_base = self.pairing_single_step(strand_id_idx, strands, s0, box_dim, ns_dims, is_checking_pbcc) # careful -- recursion
             #         return strand_id_idx, strands, bind_base
+
+            # selecting the pairing node, no longer the whole strand. But Not Assuming Direction.
             pool_base_ls.extend([bind_point_1,
-                                 bind_point_2])  # selecting the pairing node, no longer the whole strand. But Not Assuming Direction.
+                                 bind_point_2])
         # get the closest base
         min_dist = 1000000
-        bind_base = None
+        bind_base: Optional[Base] = None
         for candidate_base in pool_base_ls:
             dis = dist(candidate_base.position, s0_head.position)
             orient_dot = np.dot(np.array(s0_head.backbone), np.array(candidate_base.backbone))
             direction = np.array(candidate_base.position) - np.array(s0_head.position)
+            # check if candidate locates near the direction that s0_head's backbone vector points at.
             direction_dot = np.dot(direction / np.linalg.norm(direction),
-                                   s0_head.backbone)  # check if candidate locates near the direction that s0_head's backbone vector points at.
-            if dis < min_dist and orient_dot < 0 and dis < 4 and direction_dot > 0:  # and orient_dot < -0.7 and dis < 4 and direction_dot > 0.7
+                                   s0_head.backbone)
+            # and orient_dot < -0.7 and dis < 4 and direction_dot > 0.7
+            if dis < min_dist and orient_dot < 0 and dis < 4 and direction_dot > 0:
                 min_dist = dis
                 bind_base = candidate_base
         assert bind_base is not None
@@ -230,7 +235,7 @@ class NanoStar:
     def get_CoM_pos(self):
         """
         Obtain the center of mass of the whole nanostar
-        :return: CoM position in np.array
+        :return: CoM position in ``np.array`` .
         """
         strands = self.strands
         # CoM
