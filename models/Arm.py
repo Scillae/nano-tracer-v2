@@ -1,7 +1,16 @@
 import numpy as np
 from collections import OrderedDict
+
+
 class Arm:
     def __init__(self, arm_id, dims_ls, leading_strid, strands):
+        """
+        init Arm
+        :param arm_id: number id of the arm
+        :param dims_ls: ?
+        :param leading_strid:
+        :param strands: list of strands
+        """
         self.arm_id = arm_id
         assert len(strands) == 2
         # Noella: Accepted_sci
@@ -21,20 +30,18 @@ class Arm:
         s0 = list(strands[leading_strid].base_sequence.values())
         del strands[leading_strid]
         s1 = list(list(strands.values())[0].base_sequence.values())
-        s1.reverse() # reverse s1 so that the single_end is at the start.
+        s1.reverse()  # reverse s1 so that the single_end is at the start.
 
-        pair_tp_dic = OrderedDict() # {pair_id:(pair_base0, pair_base1)}
-        single_end_dic = OrderedDict() # {single_end_id:single_end_base}
+        pair_tp_dic = OrderedDict()  # {pair_id:(pair_base0, pair_base1)}
+        single_end_dic = OrderedDict()  # {single_end_id:single_end_base}
         for i in range(len_end):
             # index starts from center, beginning from 1.
             single_end_dic[len_end - i] = s1[i]
         del s1[0:len_end]
         for i in range(len_arm):
             # index starts from center, beginning from 1.
-            pair_tp_dic[len_arm - i] = (s0[i],s1[i])
+            pair_tp_dic[len_arm - i] = (s0[i], s1[i])
         return pair_tp_dic, single_end_dic
-
-        
 
         '''
         #single-end recog. TODO:'=='
@@ -140,5 +147,7 @@ class Arm:
                     pared_bases_tp_ls.append(pared_bases_tp)
 
 '''
+
+
 def dist(t1, t2):
-        return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))
+    return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))
