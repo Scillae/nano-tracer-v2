@@ -26,7 +26,7 @@ def patch_angle_calc(data: dict):
     p_angs_vtime_dic = TimeSeries()  # {t_stamp: angle_results}
 
     ns_dims = data['ns_dims']
-    for t_stamp, ns in ns_series.time_capsule.items():
+    for t_stamp, ns in ns_series.items():
         # Change of definition: origin~arm_end --> arm_start~arm_end
         # junction_pos = np.average(np.array([base.position for base in ns.center.values()]), 0)
         # assuming mass of nucs are the same.
