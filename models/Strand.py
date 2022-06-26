@@ -1,5 +1,7 @@
 from collections import OrderedDict
 
+from models import TimeSeries
+
 
 class Strand:
     def __init__(self, strand_id, base_seq=None, timestamp=None):
@@ -24,3 +26,4 @@ class Strand:
     @staticmethod
     def parse(s):
         pass
+
