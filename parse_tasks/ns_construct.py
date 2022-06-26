@@ -5,6 +5,12 @@ import numpy as np
 
 
 def ns_construct(data):
+    '''
+    Construct nanostar series.
+    :workspace data: Must indicate data['arm_number'], data['ns_dims'];
+        (For result catch to work properly) Should indicate data['temp'] for temperature, data['conc'] for salt concentration.
+        May include data['flag_suffix'] for simulation configuration flags, data['conf_suffix'] for nanostar topology suffix, data['sp_suffix'] for special suffix.
+    '''
     varname = 'ns'
     # load data from result_catch
     SL_result_catch(data, varname, 'load')
