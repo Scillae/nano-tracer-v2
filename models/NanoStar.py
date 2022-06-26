@@ -3,8 +3,6 @@ from collections import OrderedDict
 import numpy as np
 import copy
 
-# Noella: Accepted_sci
-# dist function should be defined before using
 def dist(t1, t2):
     return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))
 
@@ -29,11 +27,6 @@ class NanoStar:
         # for strand in strands_dic:
         for _, strand in strands_dic.items():
             for i in range(len_cen):
-                # Noella: Questioned_sci(base sequence is a dic, and thus should not be accessed by index.)
-                # `strand.base_sequence` is a list defined in line 15, `base_seq_r_ls` (a list) is passed to contructor as required parameter `base_seq`. All `strand.base_sequence.values()` should be replaced
-                # around lines: 31 44 48 68 71 (90) [may not be exactly because of new added comments lines]
-                # cen_dic[st*len_cen+i] = strand.base_sequence.values()[len_arm+i]
-                # dic or list: dict
                 sel_b = list(strand.base_sequence.values())[len_arm+i]
                 cen_dic[sel_b.base_id] = sel_b
             st += 1
