@@ -4,12 +4,12 @@ from models import TimeSeries
 
 
 class Strand:
-    def __init__(self, strand_id, base_seq=None, timestamp=None):
+    def __init__(self, strand_id:int, base_seq:OrderedDict=None, timestamp:int=None):
         """
-        init Strand
-        :param strand_id:
-        :param base_seq:
-        :param timestamp:
+        Strand is a series of bases(nucleotides). Whether the bases are paired remain unknown.
+        :param strand_id: id of this strand
+        :param base_seq: the series of bases
+        :param timestamp: at what time the strand instance appears (for debug use)
         """
         self.strand_id = strand_id
         self.timestamp = timestamp

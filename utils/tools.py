@@ -25,8 +25,8 @@ def nextline(cursor):
 
 
 def formatter(type_list, s):
-    """ elements in s must be splited by space
-
+    """ 
+    elements in s must be splited by space
     :param type_list: list of type convert function/ctor
     :param s: source string
     :return: list of converted elements
@@ -96,19 +96,21 @@ def chkdir(d):
     return
 
 
-def dims_adjust(dims_ls, conf_suffix, single=True, sp_suffix=''):
+def dims_adjust(ns_dims, conf_suffix, single=True, sp_suffix=''):
     """
-    Adjust the dims_ls based on conf_suffix
-    :param dims_ls: the dimensions of the nanostar
+    Adjust the ns_dims based on conf_suffix
+    :param ns_dims: the dimensions of the nanostar
     :param conf_suffix: the suffix describing nanostar's configuration
     :param single: if it's for a single nanostar
     :param sp_suffix: special suffix
     """
-    dims_ls = [20, 2, 7]
+    ns_dims = [20, 2, 7]
     if conf_suffix.split('_')[0] == '':
         return
     if conf_suffix.split('_')[0] == '-jun':
-        dims_ls[1] = int(conf_suffix.split('_')[1])
+        ns_dims[1] = int(conf_suffix.split('_')[1])
     else:
-        assert 0 == 1
-    return
+        raise Exception("Unknown Conformation Suffix!")
+
+def dist(t1, t2):
+    return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))
