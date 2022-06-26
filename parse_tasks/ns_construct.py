@@ -18,14 +18,7 @@ def ns_construct(data):
     strands_series = strands_construct(data, generate_path(data, 'top_path'), generate_path(data, 'traj_path'))
 
     nc = NanoConstructor(strands_series, data['ns_dims'], data['arm_number'])
-    # box_dim hacking
-    import re
-    with open(path_traj, 'r') as f:
-        f.readline()
-        ret = re.match('^b = ([0-9]+) ([0-9]+) ([0-9]+)\n', f.readline())
-    box_dim = np.array((int(ret.group(1)), int(ret.group(2)), int(ret.group(3))))
-    # hacking ends
-
+    
     ns_series = nc.construct(box_dim=box_dim)
     # save in result_catch
     data['SL_content'] = ns_series

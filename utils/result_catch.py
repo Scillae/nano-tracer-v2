@@ -42,8 +42,6 @@ def generate_path(data, path_name):
     plotpath = f'results/{arms}arms{conf_suffix}{flag_suffix}/{varname}/{varname}_hist-{label}.png'
     if flag_suffix in ['-cenT', '-cenToxDNA2']:
         top_path = f'../../ox-sync/simul-inputs-{arms}arms{conf_suffix}{flag_suffix}/{arms}arm-rods{conf_suffix}-cenT.top'
-    if vtime == True:
-        plotpath = f'results/{arms}arms{conf_suffix}{flag_suffix}/{varname}/{varname}_vtime-{label}.png'
     savepath = f'data/result_catch_files/{flag_suffix}/{arms}arms{conf_suffix}/{loose_lbl}/{label}'
     var_path = f'{savepath}.{varname}'
 
