@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 
 class Arm:
-    def __init__(self, arm_id:int, ns_dims:list, leading_strid:int, strands:dict):
+    def __init__(self, arm_id: int, ns_dims: list, leading_strid: int, strands: dict):
         """
         Arm is the dsDNA part of a nanostar
         :param arm_id: number id of the arm
@@ -17,13 +17,13 @@ class Arm:
         self.base_pairs, self.single_end = self.pair(ns_dims, leading_strid, strands)
 
     # pair bases
-    def pair(self, ns_dims:list, leading_strid:int, strands:dict):
+    def pair(self, ns_dims: list, leading_strid: int, strands: dict):
         """
-        Pair bases in the given two strands to form an arm. Bps in arm count from center, starting from 1.
+        Pair bases in the given two strands to form an arm. Bps in arm count from center, starting from 1
         :param ns_dims: a list describing the dimensions of the nanostars, [len_arm, len_cen, len_end]
         :param leading_strid: indicating the leading strand of the arm (w/o ssDNA end)
         :param strands: list of strands
-        """        
+        """
         len_arm, len_cen, len_end = ns_dims
         s0 = list(strands[leading_strid].base_sequence.values())
         del strands[leading_strid]

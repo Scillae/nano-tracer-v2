@@ -37,10 +37,6 @@ class Base:
         return self.position
 
     @staticmethod
-    def parse_string(s):
-        pass
-
-    @staticmethod
     def parse_list(params):
         """
         unpack list/tuple to Base instance
