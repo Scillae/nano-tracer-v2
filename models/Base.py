@@ -1,4 +1,23 @@
 # import numpy as np
+
+def get_nucleotide_masses(base_type):
+    # https://www.sciencephoto.com/media/540537/view/dna-structure-artwork
+    phosphate = 94.97
+    deoxyribose = 134.13
+    ademine = 135.13
+    thymine = 126.11
+    cytosine = 111.10
+    guanine = 151.13
+    uracil = 112.09
+    mass_dic = {
+        'A':phosphate+deoxyribose+ademine,
+        'T':phosphate+deoxyribose+thymine,
+        'C':phosphate+deoxyribose+cytosine,
+        'G':phosphate+deoxyribose+guanine,
+        'U':phosphate+deoxyribose+uracil
+    }
+    return mass_dic[base_type]
+
 class Base:
     def __init__(self, base_id, base_type, prev_id, next_id, position,
                  backbone, normal, velocity, angular_velocity, strand_id=-1):
@@ -26,6 +45,9 @@ class Base:
         self.angular_velocity = angular_velocity
         self.strand_id = strand_id
 
+        self.mass = get_nucleotide_masses(base_type)
+        # other base-dependent quantities should be initialized here as a property
+
     def set_position(self, position):
         """
         set position of base
@@ -35,6 +57,8 @@ class Base:
         assert len(position) == 3
         self.position = position
         return self.position
+
+
 
     @staticmethod
     def parse_list(params):

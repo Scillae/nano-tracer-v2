@@ -23,7 +23,7 @@ def patch_angle_calc(data: dict):
     # load ns series
     ns_series = ns_construct(data)
 
-    p_angs_vtime_dic = TimeSeries()  # {t_stamp: angle_results}
+    patch_angle_results = TimeSeries()  # {t_stamp: angle_results}
 
     ns_dims = data['ns_dims']
     for t_stamp, ns in ns_series.items():
@@ -43,7 +43,7 @@ def patch_angle_calc(data: dict):
 
                 # select bps forming the vectors representing the direction of arms
                 if ns_dims[0] > 12:
-                    first_pair_a1 = arm1.base_pairs[ns_dims[0] - 2 - 10]
+                    first_pair_a1 = arm1.base_pairs[ns_dims[0] - 2 - 10] # b-form DNA, loop length == 10
                     first_pair_a2 = arm2.base_pairs[ns_dims[0] - 2 - 10]
                     last_pair_a1 = arm1.base_pairs[ns_dims[0] - 2]
                     last_pair_a2 = arm2.base_pairs[ns_dims[0] - 2]
@@ -64,14 +64,14 @@ def patch_angle_calc(data: dict):
                 # ang_cross = obtain_cross(vec_1, vec_2) # -90~90
                 ang = ang_cos  # if ang_cross >= 0 else (360 - ang_cos) # expanding angle range from 0~180 to 0~360
                 angle_results[(ia1, ia2)] = (ang, (vec_1, vec_2), is_sharing_strand)
-        p_angs_vtime_dic[t_stamp] = angle_results
-    p_angs_vtime_dic.params['Arm_Pairs'] = [(ia1, arms_idx[idx_2]) for idx_1, ia1 in enumerate(arms_idx) for idx_2 in
+        patch_angle_results[t_stamp] = angle_results
+    patch_angle_results.params['Arm_Pairs'] = [(ia1, arms_idx[idx_2]) for idx_1, ia1 in enumerate(arms_idx) for idx_2 in
                                             range(idx_1 + 1, len(arms_idx))]
 
     # save in result_catch
-    data['SL_content'] = p_angs_vtime_dic
+    data['SL_content'] = patch_angle_results
     SL_result_catch(data, varname, 'save')
-    return p_angs_vtime_dic
+    return patch_angle_results
 
 
 def obtain_cos(v1, v2):

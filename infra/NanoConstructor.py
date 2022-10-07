@@ -1,13 +1,5 @@
-from models import Strand, Base, NanoStar, Arm
-# from models import Strand, Base, NanoStar, NanoMesh, Arm
+from models import NanoStar
 from infra import TimeSeries
-from collections import OrderedDict
-from utils import save_load as SL
-import numpy as np
-import copy
-import pickle
-import os.path
-
 
 class NanoConstructor:
     def __init__(self, strands_series, ns_dims, arm_number):

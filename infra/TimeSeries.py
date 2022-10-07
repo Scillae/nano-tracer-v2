@@ -15,7 +15,7 @@ class TimeSeries(OrderedDict):
         if keys and vals:
             self.add_instances(keys, vals)
         # keyword parameters saved in property: params (dictionary)
-        self.params = kwargs
+        self.params = kwargs # time-independent quantities should be logged here.
 
     def add_instances(self, keys: list, vals: list):
         """

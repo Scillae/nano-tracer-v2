@@ -6,13 +6,6 @@ from infra import TimeSeries
 from utils import assignment_parser, nextline, formatter
 from collections import OrderedDict
 
-number_to_base = {0: 'A', 1: 'G', 2: 'C', 3: 'T'}
-
-base_to_number = {'A': 0, 'a': 0, 'G': 1, 'g': 1,
-                  'C': 2, 'c': 2, 'T': 3, 't': 3,
-                  'U': 3, 'u': 3, 'D': 4}
-
-
 class StrandConstructor:
     """
     Input topology and configuration file, return a time series of Strands
@@ -34,13 +27,15 @@ class StrandConstructor:
             'nucleotide_tr': tuple(
                 [tuple([float for i in range(3)]) for i in range(5)]),
             'nucleotide_tp': tuple(
-                [int, lambda x: base_to_number[x], int, int]),
+                [int, str, int, int]), # str was lambda x: base_to_number[x]
             # TODO handle undefined base
             'counts': (int, int),
         }
         self.strands = OrderedDict()
         self.timestamp = -1
         self.time_series = None
+        self.energy = None # total, potential, kinetic
+        self.box = None
 
     def read_single_strand(self) -> int:
         """
@@ -65,12 +60,13 @@ class StrandConstructor:
                                                assignment_parser(line)[-1])[0]
         # box size
         line = nextline(self.traj_cursor)
-        box = formatter(self.format['box'], assignment_parser(line)[-1])
+        self.box = formatter(self.format['box'], assignment_parser(line)[-1])
 
         # info
         line = nextline(self.traj_cursor)
-        total, potential, kinetic = formatter(self.format['energy'],
+        self.energy = formatter(self.format['energy'],
                                               assignment_parser(line)[-1])
+        
         # nucleotide
         base_incre = 0
         tr_line = nextline(self.traj_cursor)
@@ -125,6 +121,8 @@ class StrandConstructor:
                     print(
                         f'    id: {i.strand_id}, base_count: {len(i.base_sequence)}')
             res = self.read_single_strand()
+        self.time_series.params['box'] = self.box
+        self.time_series.params['energy'] = self.energy
         print('Reach end of file.')
         print(f'Total time series length: {len(self.time_series)}')
         return self.time_series
