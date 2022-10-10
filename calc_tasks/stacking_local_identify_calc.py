@@ -31,11 +31,11 @@ def stacking_local_identify_calc(data:dict):
         stack_ls = [] # [(adj_bp, adj_bp2, arm_id, arm2_id)] stores the 'unpaired' central bases adjacent to the 1st bps.
         shift_dic = {} # can be int or tuple. int --> which bp in the arm is the 1st; tuple: use the provided
         mismatch_b_ls = [] # pool of all mis-matched bases (unpaired bases that belong to an arm and are expected to be paired)
-        arms_idx = list(ns.arms.keys())
+        arms_IDs = list(ns.arms.keys())
         
         # fix the nanostar's broken pairs and mis-matched bps. (Could be a part of the models: re-matched_ns_construct.py?)
         # detect the 1st paired bp in arm & create the mis-matched bases pool
-        for ia0 in arms_idx:
+        for ia0 in arms_IDs:
             arm0 = ns.arms[ia0]
             for i in range(data['ns_dims'][0]):
                 if check_if_bp(arm0.base_pairs[i+1][0],arm0.base_pairs[i+1][1]): # idx of base_pairs starts from 1
@@ -59,7 +59,7 @@ def stacking_local_identify_calc(data:dict):
 
             # find which arm the mismatched should append to
             fbp_dic = {} # {(first base pair) : index of arm}
-            for ia in arms_idx:
+            for ia in arms_IDs:
                 fbp_dic[ns.arms[ia].base_pairs[shift_dic[ia]]] = ia # all are the 'true' start (broken bps excluded)
                 shift_dic[ia] = {} #  shift_dic[ia] = {dist: bp}
             for bp in mismatch_bp_ls:
@@ -89,11 +89,11 @@ def stacking_local_identify_calc(data:dict):
         # identify the stacked arm pairs
         # generate potential stk_arm_pairs
         ptt_aps = [] # [(arm1,arm2)]
-        arms_idx = list(ns.arms.keys())
-        for idx_0, ia0 in enumerate(arms_idx):
+        arms_IDs = list(ns.arms.keys())
+        for idx_0, ia0 in enumerate(arms_IDs):
             arm0_dir = get_arm_dir(ns.arms[ia0], is_RNA) # get the arm's direction
-            for idx_1 in range(idx_0+1, len(arms_idx)):
-                arm1_dir = get_arm_dir(ns.arms[arms_idx[idx_1]],is_RNA)
+            for idx_1 in range(idx_0+1, len(arms_IDs)):
+                arm1_dir = get_arm_dir(ns.arms[arms_IDs[idx_1]],is_RNA)
                 # find if angle~ {arm_dir0:arm_dir1} < threshold
                 if obtain_cos(arm0_dir, arm1_dir*(-1)) < 30: # one arm reversed. 30deg --> ang==150deg. </EMPIRICAL THRESHOLD/>
                     ptt_aps.append((arm0, arm1))

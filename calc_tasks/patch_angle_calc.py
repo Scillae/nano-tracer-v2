@@ -16,7 +16,7 @@ def patch_angle_calc(data: dict):
     SL_result_catch(data, varname, 'load')
     if data['SL_content']:
         catched_result = data['SL_content']
-        data['SL_content'] = None
+        data['SL_content'] = None # deepcopy?
         return catched_result
 
     # not catched
@@ -31,14 +31,14 @@ def patch_angle_calc(data: dict):
         # junction_pos = np.average(np.array([base.position for base in ns.center.values()]), 0)
         # assuming mass of nucs are the same.
         arms = ns.arms
-        arms_idx = list(arms.keys())
-        angle_results = {}  # {(ia1, ia2):(ang, (vec_1, vec_2), is_sharing)}
+        arms_IDs = list(arms.keys())
+        angle_results = {}  # {(ia1, ia2):(ang, (vec_1, vec_2), is_linked)}
 
         # select two arms to form an arm pair
-        for idx_1, ia1 in enumerate(arms_idx):
+        for idx_1, ia1 in enumerate(arms_IDs):
             arm1 = arms[ia1]
-            for idx_2 in range(idx_1 + 1, len(arms_idx)):
-                ia2 = arms_idx[idx_2]
+            for idx_2 in range(idx_1 + 1, len(arms_IDs)):
+                ia2 = arms_IDs[idx_2]
                 arm2 = arms[ia2]
 
                 # select bps forming the vectors representing the direction of arms
@@ -54,7 +54,7 @@ def patch_angle_calc(data: dict):
                     last_pair_a2 = arm2.base_pairs[ns_dims[0]]
 
                     # check if the two arms share a strand
-                is_sharing_strand = True if len(
+                is_linked_strand = True if len(
                     set([arm1.strand_id_0, arm1.strand_id_1, arm2.strand_id_0, arm2.strand_id_1])) == 3 else False
 
                 # calculate patch angle
@@ -63,10 +63,11 @@ def patch_angle_calc(data: dict):
                 ang_cos = obtain_cos(vec_1, vec_2)  # 0~180
                 # ang_cross = obtain_cross(vec_1, vec_2) # -90~90
                 ang = ang_cos  # if ang_cross >= 0 else (360 - ang_cos) # expanding angle range from 0~180 to 0~360
-                angle_results[(ia1, ia2)] = (ang, (vec_1, vec_2), is_sharing_strand)
+                angle_results[(ia1, ia2)] = (ang, (vec_1, vec_2), is_linked_strand)
         patch_angle_results[t_stamp] = angle_results
-    patch_angle_results.params['Arm_Pairs'] = [(ia1, arms_idx[idx_2]) for idx_1, ia1 in enumerate(arms_idx) for idx_2 in
-                                            range(idx_1 + 1, len(arms_idx))]
+    patch_angle_results.params['Arm_Pairs'] = [(ia1, arms_IDs[idx_2]) for idx_1, ia1 in enumerate(arms_IDs) for idx_2 in
+                                            range(idx_1 + 1, len(arms_IDs))]
+    patch_angle_results.params['Arm_IDs'] = arms_IDs
 
     # save in result_catch
     data['SL_content'] = patch_angle_results

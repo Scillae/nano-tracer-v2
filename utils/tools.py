@@ -113,6 +113,16 @@ def dims_adjust(ns_dims, conf_suffix, single=True, sp_suffix=''):
     else:
         raise Exception("Unknown Conformation Suffix!")
 
+def data_query(data, query_vals, vals_types=None):
+    default_vals = {'int': 0, 'str': '', 'dict': None, 'list': None}
+    return_vals = []
+    for i, val_name in enumerate(query_vals):
+        if val_name in data:
+            val = data[val_name] 
+        else:
+            val = default_vals[vals_types[i]] if vals_types is not None else None
+        return_vals.append(val)
+    return return_vals
 
 def dist(t1, t2):
     return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))
