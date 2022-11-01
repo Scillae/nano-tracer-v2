@@ -1,9 +1,9 @@
 import numpy as np
 from utils.result_catch import generate_path
-from utils.tools import chkdir, data_query, dims_adjust
+from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
 
 
-def ns_pa_plot(data: dict):
+def ns_pa_plot_vstime(data: dict):
     '''
     Plot nanostar's patch angles vs time per arm pair. Raw values, Running avgs, and running rmsds are plotted.
     Single trajectory!
@@ -19,9 +19,9 @@ def ns_pa_plot(data: dict):
     # load data from result_catch
     SL_result_catch(data, varname, 'load')
     if not data['SL_content']:
-        print(f'The results trying to be plotted is not catched. Run calc_func.patch_angle_calc first.')
+        print(f'The results trying to be plotted is not catched. Run calc_tasks.stacking_local_identify_calc first.')
         return False
-    stack_info = data_process_func(data['SL_content'], data)
+    stack_info = data_process_func_si(data['SL_content'], data)
     data['SL_content'] = None
 
     # retrieve result from calc_func.patch_angle_calc
@@ -45,11 +45,16 @@ def ns_pa_plot(data: dict):
     #### conf ends ####
 
     plot_confs = varname, x_var, x_lim, y_lim, text_pos, bin_num, plot_path, label
-    ns_time_pa_plot(var_vals, stack_info, plot_confs, data) # move var_vals, stack_info into data if they might be accessed anywhere except this function
+    ns_pa_plot(var_vals, stack_info, plot_confs, data) # move var_vals, stack_info into data if they might be accessed anywhere except this function
     # can register 'stack_info' into data if needed. ns_time_pa_plot has modified it.
+    
+    # save in result_catch
+    varname = 'sijpa' # stack_info joining patch angle
+    data['SL_content'] = stack_info
+    SL_result_catch(data, varname, 'save')
     return
 
-def ns_time_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: dict):
+def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: dict):
     '''
     Plot the value (patch angle vtime) vs. time plot of a single trajectory.
     :var_vals: value vs time.
@@ -59,7 +64,7 @@ def ns_time_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: d
     '''
     # unpack configurations & obtain parameters
     varname, x_var, x_lim, y_lim, text_pos, bin_num, plot_path, label = plot_confs
-    time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, _, _, _, ns_struc = get_params(int(label[0]))
+    time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, _, _, _, ns_struc = get_ns_params(int(label[0]))
     
     # subplots layout
     row,col = (len((var_vals.items())),3)
@@ -68,7 +73,7 @@ def ns_time_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: d
     axs = gs.subplots(sharex='col')
     
     # plot running avg & rmsd
-    for i, ((ia1,ia2), ang_vs_time) in enumerate(var_vals.items()):
+    for i, (ia1,ia2), ang_vs_time in enumerate(var_vals.items()): # ang_vs_time: {time:ang}
         # i: loop of arm pairs.
         # colorcode the linked & unlinked
         if (ia1,ia2) in ns_struc['linked_PA']:
@@ -76,14 +81,16 @@ def ns_time_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: d
         else:
             legend_color='#4994FF'
         
-        ang_ls = [ang_vs_time[t][0] for t in ang_vs_time if type(t) == int]
+        ang_ls = [ang_vs_time[t][0] for t in ang_vs_time if type(t) == int] # there might be misc keys mixed in t. Need to fix.
         time_ls = [t for t in ang_vs_time if type(t) == int]
+        assert len(stack_info[(ia1,ia2)]['t']) == len(time_ls) # frames may be dropped in calc_func.patch_angle_calc. If so, write lines that drop time frames in stack_info which is absent in patch angle result
         time_idx = time_ls[time_window_width//2:-time_window_width//2+1] # truncate because runningavg & runningrmsd have less datapoints
         
         # data preparation
         stack_info[(ia1,ia2)]['avg'] = [np.sum(ang_ls[j:j+time_window_width])/time_window_width for j in range(len(time_idx))]
         stack_info[(ia1,ia2)]['rmsd'] = [np.std(ang_ls[j:j+time_window_width]) for j in range(len(time_idx))]
-        stack_info[(ia1,ia2)]['raw'] = ang_ls[time_window_width//2:-time_window_width//2+1]
+        stack_info[(ia1,ia2)]['raw'] = ang_ls[time_window_width//2:-time_window_width//2+1] # short length, use with running avg & rmsd
+        stack_info[(ia1,ia2)]['ang'] = ang_ls # full length
 
         avg_running_is_stacking = stack_info[(ia1,ia2)]['bool'][5:-5] # truncated because running avg & rmsd have less datapoints
         ang_running_avg = stack_info[(ia1,ia2)]['avg'] 
@@ -168,7 +175,7 @@ def counting_stacking(stack_info: dict, number_stack: int, is_count_all: bool, i
         s = stack_info[iaidx]['bool']
         stacking_result[iaidx] = [sum(s),len(s),sum(s)/len(s)]
     # simutaneous stacking
-    if ns_struc['#arm'] == 4:
+    if ns_struc['arm_number'] == 4:
         for iaidx1, iaidx2 in ns_struc['pairing_linked']:
             s1 = stack_info[iaidx1]['bool']
             s2 = stack_info[iaidx2]['bool']
@@ -248,59 +255,3 @@ def data_process_func_si(stacking_res: dict, data: dict):
 
 def create_ia_idx_ls(arm_num: int):
     return [(ia1,ia2) for ia1 in range(arm_num) for ia2 in range(ia1+1,arm_num)]
-
-def get_params(arm_num: int):
-    '''
-    Parameters for generating time-averaged patch angle vs time plots.
-    All are empirical values currently.
-    '''
-    if arm_num == 3:
-        time_window_width = 11 # 15
-        stacking_min_length = 10 # 
-        stacking_crit_ang = 120 # 
-        stacking_crit_rmsd = 12 # 
-        nonstacking_min_length = 5 # 
-        nonstacking_crit_ang = 105 # 
-        nonstacking_crit_rmsd = 15 # 
-        ns_struc = {'#arm':3, 'linked_PA': [(0,1),(0,2),(1,2)], 'PA' : [(0,1),(0,2),(1,2)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
-    elif arm_num == 4:
-        time_window_width = 11 # 15
-        stacking_min_length = 10 # 
-        stacking_crit_ang = 120 # 
-        stacking_crit_rmsd = 12 # 
-        nonstacking_min_length = 5 # 
-        nonstacking_crit_ang = 65 # 
-        nonstacking_crit_rmsd = 15 # 
-        ns_struc = {'#arm':4, 'linked_PA': [(0,1),(0,3),(1,2),(2,3)], 'PA': [(0,1),(0,3),(1,2),(2,3),(0,2),(1,3)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
-    elif arm_num == 5:
-        time_window_width = 11 # 15
-        stacking_min_length = 10 # useful when CoM is at the center of PJ.
-        stacking_crit_ang = 120 #  # should be 130?
-        stacking_crit_rmsd = 12 # 
-        nonstacking_min_length = 5 # 
-        nonstacking_crit_ang = 65 # 
-        nonstacking_crit_rmsd = 15 # 
-        ns_struc = {'#arm':5, 'linked_PA': [(0,1),(0,4),(1,2),(2,3),(3,4)], 'PA' : [(0,1),(0,4),(1,2),(2,3),(3,4),(0,2),(1,3),(2,4),(0,3),(1,4)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
-    elif arm_num == 6:
-        time_window_width = 11 # 15
-        stacking_min_length = 10 # useful when CoM is at the center of PJ.
-        stacking_crit_ang = 120 # 
-        stacking_crit_rmsd = 12 # 
-        nonstacking_min_length = 5 # 
-        nonstacking_crit_ang = 50 # 
-        nonstacking_crit_rmsd = 15 # 
-        ns_struc = {'#arm':6, 'linked_PA': [(0,1),(0,5),(1,2),(2,3),(3,4),(4,5)], 'PA' : [(0,1),(0,5),(1,2),(2,3),(3,4),(4,5),(0,2),(1,3),(2,4),(3,5),(0,3),(1,4),(2,5),(0,4),(1,5)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
-    elif arm_num == 2:
-        time_window_width = 11 # 15
-        stacking_min_length = 10 # 
-        stacking_crit_ang = 120 # 
-        stacking_crit_rmsd = 12 # 
-        nonstacking_min_length = 5 # 
-        nonstacking_crit_ang = 105 # 
-        nonstacking_crit_rmsd = 15 # 
-        ns_struc = {'#arm':2, 'linked_PA': [(0,1)], 'PA' : [(0,1)], 'pairing_linked':[], 'pairing_unlinked':[]}
-
-    else:
-        assert 0==1    
-    assert time_window_width % 2 == 1 # must be odd
-    return time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, nonstacking_min_length, nonstacking_crit_ang, nonstacking_crit_rmsd, ns_struc

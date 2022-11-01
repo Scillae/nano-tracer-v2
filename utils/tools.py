@@ -126,3 +126,59 @@ def data_query(data, query_vals, vals_types=None):
 
 def dist(t1, t2):
     return np.sqrt(np.sum(np.square(np.array(t1) - np.array(t2))))
+
+def get_ns_params(arm_num: int):
+    '''
+    Parameters for generating time-averaged patch angle vs time plots.
+    All are empirical values currently.
+    '''
+    if arm_num == 3:
+        time_window_width = 11 # 15
+        stacking_min_length = 10 # 
+        stacking_crit_ang = 120 # 
+        stacking_crit_rmsd = 12 # 
+        nonstacking_min_length = 5 # 
+        nonstacking_crit_ang = 105 # 
+        nonstacking_crit_rmsd = 15 # 
+        ns_struc = {'arm_number':3, 'linked_PA': [(0,1),(0,2),(1,2)], 'PA' : [(0,1),(0,2),(1,2)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
+    elif arm_num == 4:
+        time_window_width = 11 # 15
+        stacking_min_length = 10 # 
+        stacking_crit_ang = 120 # 
+        stacking_crit_rmsd = 12 # 
+        nonstacking_min_length = 5 # 
+        nonstacking_crit_ang = 65 # 
+        nonstacking_crit_rmsd = 15 # 
+        ns_struc = {'arm_number':4, 'linked_PA': [(0,1),(0,3),(1,2),(2,3)], 'PA': [(0,1),(0,3),(1,2),(2,3),(0,2),(1,3)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
+    elif arm_num == 5:
+        time_window_width = 11 # 15
+        stacking_min_length = 10 # useful when CoM is at the center of PJ.
+        stacking_crit_ang = 120 #  # should be 130?
+        stacking_crit_rmsd = 12 # 
+        nonstacking_min_length = 5 # 
+        nonstacking_crit_ang = 65 # 
+        nonstacking_crit_rmsd = 15 # 
+        ns_struc = {'arm_number':5, 'linked_PA': [(0,1),(0,4),(1,2),(2,3),(3,4)], 'PA' : [(0,1),(0,4),(1,2),(2,3),(3,4),(0,2),(1,3),(2,4),(0,3),(1,4)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
+    elif arm_num == 6:
+        time_window_width = 11 # 15
+        stacking_min_length = 10 # useful when CoM is at the center of PJ.
+        stacking_crit_ang = 120 # 
+        stacking_crit_rmsd = 12 # 
+        nonstacking_min_length = 5 # 
+        nonstacking_crit_ang = 50 # 
+        nonstacking_crit_rmsd = 15 # 
+        ns_struc = {'arm_number':6, 'linked_PA': [(0,1),(0,5),(1,2),(2,3),(3,4),(4,5)], 'PA' : [(0,1),(0,5),(1,2),(2,3),(3,4),(4,5),(0,2),(1,3),(2,4),(3,5),(0,3),(1,4),(2,5),(0,4),(1,5)], 'pairing_linked':[((0,1),(2,3)),((0,3),(1,2))], 'pairing_unlinked':[((0,2),(1,3))]}
+    elif arm_num == 2:
+        time_window_width = 11 # 15
+        stacking_min_length = 10 # 
+        stacking_crit_ang = 120 # 
+        stacking_crit_rmsd = 12 # 
+        nonstacking_min_length = 5 # 
+        nonstacking_crit_ang = 105 # 
+        nonstacking_crit_rmsd = 15 # 
+        ns_struc = {'arm_number':2, 'linked_PA': [(0,1)], 'PA' : [(0,1)], 'pairing_linked':[], 'pairing_unlinked':[]}
+
+    else:
+        assert 0==1    
+    assert time_window_width % 2 == 1 # must be odd
+    return time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, nonstacking_min_length, nonstacking_crit_ang, nonstacking_crit_rmsd, ns_struc
