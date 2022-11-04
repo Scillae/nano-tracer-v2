@@ -1,7 +1,7 @@
 import numpy as np
 from utils.result_catch import generate_path
 from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
-
+import plot_tasks.ns_si_process.data_process_func
 
 def ns_pa_plot_vstime(data: dict):
     '''
@@ -19,9 +19,8 @@ def ns_pa_plot_vstime(data: dict):
     # load data from result_catch
     SL_result_catch(data, varname, 'load')
     if not data['SL_content']:
-        print(f'The results trying to be plotted is not catched. Run calc_tasks.stacking_local_identify_calc first.')
-        return False
-    stack_info = data_process_func_si(data['SL_content'], data)
+        raise Exception('The results trying to be plotted is not catched. Run calc_tasks.stacking_local_identify_calc first.')
+    stack_info = plot_tasks.ns_si_process.data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
     # retrieve result from calc_func.patch_angle_calc
@@ -29,24 +28,20 @@ def ns_pa_plot_vstime(data: dict):
     # load data from result_catch
     SL_result_catch(data, varname, 'load')
     if not data['SL_content']:
-        print(f'The results trying to be plotted is not catched. Run calc_func.patch_angle_calc first.')
-        return False
+        raise Exception('The results trying to be plotted is not catched. Run calc_func.patch_angle_calc first.')
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
     #### plot confs ####
     x_var = rf'Patch Angles ($^\circ$)'
-    x_lim = (0,360)
-    y_lim = (0,0.17)
-    bin_num = 50
-    text_pos = (10, 0.12)
     plot_path = generate_path(data, 'plot_path')
     label = generate_path(data, 'label')
     #### conf ends ####
 
-    plot_confs = varname, x_var, x_lim, y_lim, text_pos, bin_num, plot_path, label
+    plot_confs = {'x_var':x_var, 'plot_path':plot_path, 'label':label}
     ns_pa_plot(var_vals, stack_info, plot_confs, data) # move var_vals, stack_info into data if they might be accessed anywhere except this function
     # can register 'stack_info' into data if needed. ns_time_pa_plot has modified it.
+    # plot saved inside the function
     
     # save in result_catch
     varname = 'sijpa' # stack_info joining patch angle
@@ -54,7 +49,7 @@ def ns_pa_plot_vstime(data: dict):
     SL_result_catch(data, varname, 'save')
     return
 
-def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: dict):
+def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: dict, data: dict):
     '''
     Plot the value (patch angle vtime) vs. time plot of a single trajectory.
     :var_vals: value vs time.
@@ -63,7 +58,7 @@ def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: tuple, data: dict):
     :data: in which the descriptions of nanostars (trajectory) are stored. NOT the data to be plotted.
     '''
     # unpack configurations & obtain parameters
-    varname, x_var, x_lim, y_lim, text_pos, bin_num, plot_path, label = plot_confs
+    x_var, plot_path, label = data_query(data, ['x_var','plot_path','label'],['str','str','str'])
     time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, _, _, _, ns_struc = get_ns_params(int(label[0]))
     
     # subplots layout
@@ -215,43 +210,6 @@ def data_process_func(p_ang_res: dict, data: dict): # should be trimmed.
             print(f'Drop frame due to wrong number of linked patch angle: {t_stamp}')
     print(f'Total time steps dropped: {len(drop_t_ls)}')
     return angle_dic
-
-def data_process_func_si(stacking_res: dict, data: dict):
-    '''
-    Obtain information regarding stacked arm pairs vs time. (Generate stack_info)
-    (If stacked info is to be plotted, use this as the data_process_func for that script.)
-    :stacking_res: result of stack information
-    :data: no dependence yet. remember to register if added later.
-    '''
-    # stacking_res: OrderedDict{t_stamp: is_stacking, stack_ls}
-    arms, temp, conc, sp_suffix, conf_suffix, flag_suffix, dims_ls = data
-    # init
-    stack_info = {}
-    for ia1,ia2 in create_ia_idx_ls(arms):
-        stack_info[(ia1,ia2)] = {}
-        stack_info[(ia1,ia2)]['bool'] = np.zeros(len(stacking_res.keys()),dtype=bool)
-        stack_info[(ia1,ia2)]['t'] = np.zeros(len(stacking_res.keys()),dtype=int)
-        stack_info[(ia1,ia2)]['adj_bps'] = np.zeros(len(stacking_res.keys()),dtype=bool)
-    # fill data in
-    for i, (t, (is_stacking, stack_ls)) in enumerate(stacking_res.items()):
-        
-        if is_stacking == False:
-            continue
-        for adj_bp, adj_bp2, arm_id, arm2_id in stack_ls:
-            stack_info[(arm_id,arm2_id)]['bool'][i] = True
-            stack_info[(arm_id,arm2_id)]['adj_bps'][i] = adj_bp, adj_bp2 # deprecated
-    # smoothing
-    window_hw = 5 # window_hw *2 +1 == window_width
-    for ia1,ia2 in create_ia_idx_ls(arms):
-        bool_ls = stack_info[(ia1,ia2)]['bool']
-        smooth_ls = [True if sum(bool_ls[i:i+window_hw*2 +1]) > window_hw+1 else False for i in range(len(bool_ls)-window_hw*2)] # threshold: 50%
-        r_ls = [True if sum(bool_ls[0:i+window_hw +1]) > window_hw or bool_ls[i] else False for i in range(window_hw)] # still 50% of full window width?
-        r_ls.extend(smooth_ls)
-        r_ls.extend([True if sum(bool_ls[i-window_hw:]) > window_hw or bool_ls[i] else False for i in range(-window_hw,0)])
-        assert len(r_ls) == len(bool_ls)
-        stack_info[(ia1,ia2)]['bool'] = r_ls
-        stack_info[(ia1,ia2)]['t'] = list(stacking_res) # filling in time indices as well
-    return stack_info
 
 def create_ia_idx_ls(arm_num: int):
     return [(ia1,ia2) for ia1 in range(arm_num) for ia2 in range(ia1+1,arm_num)]

@@ -53,7 +53,7 @@ def patch_angle_calc(data: dict):
                     last_pair_a1 = arm1.base_pairs[ns_dims[0]]
                     last_pair_a2 = arm2.base_pairs[ns_dims[0]]
 
-                    # check if the two arms share a strand
+                # check if the two arms share a strand
                 is_linked_strand = True if len(
                     set([arm1.strand_id_0, arm1.strand_id_1, arm2.strand_id_0, arm2.strand_id_1])) == 3 else False
 
