@@ -32,10 +32,10 @@ def ns_pa_hist_plot(data): # entry point for generating the patch angle histogra
     '''
     # retrieve result from calc_func.patch_angle_calc
     varname = 'pa'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        print(f'The results trying to be plotted is not catched. Run calc_func.patch_angle_calc first.')
+        print(f'The results trying to be plotted is not cached. Run calc_func.patch_angle_calc first.')
         return False
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
@@ -57,10 +57,10 @@ def ns_pa_plot(data):
     '''
     # retrieve result from calc_func.stacking_local_identify_calc
     varname = 'sijpa'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        print(f'The results trying to be plotted is not catched. Run plot_tasks.ns_pa_plot_vstime first.')
+        print(f'The results trying to be plotted is not cached. Run plot_tasks.ns_pa_plot_vstime first.')
         return False
     stack_info = data_process_func(data['SL_content'], data)
     data['SL_content'] = None

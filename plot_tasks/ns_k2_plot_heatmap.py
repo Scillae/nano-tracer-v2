@@ -13,19 +13,19 @@ def ns_k2_plot_heatmap(data):
     '''
     # retrieve result from calc_func.stacking_local_identify_calc
     varname = 'si'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not catched. Run calc_tasks.stacking_local_identify_calc first.')
+        raise Exception('The results trying to be plotted is not cached. Run calc_tasks.stacking_local_identify_calc first.')
     stack_info = plot_tasks.ns_si_process.data_process_func(data['SL_content'], data)
     data['SL_content'] = None
     
     # retrieve result from calc_func.k2_calc
     varname = 'k2'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not catched. Run calc_tasks.k2_calc first.')
+        raise Exception('The results trying to be plotted is not cached. Run calc_tasks.k2_calc first.')
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
     

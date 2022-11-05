@@ -1,5 +1,5 @@
 import numpy as np
-from utils.result_catch import generate_path
+from utils.result_cache import generate_path
 from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
 import plot_tasks.ns_si_process.data_process_func
 
@@ -16,19 +16,19 @@ def ns_pa_plot_vstime(data: dict):
 
     # retrieve result from calc_func.stacking_local_identify_calc
     varname = 'si'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not catched. Run calc_tasks.stacking_local_identify_calc first.')
+        raise Exception('The results trying to be plotted is not cached. Run calc_tasks.stacking_local_identify_calc first.')
     stack_info = plot_tasks.ns_si_process.data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
     # retrieve result from calc_func.patch_angle_calc
     varname = 'pa'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not catched. Run calc_func.patch_angle_calc first.')
+        raise Exception('The results trying to be plotted is not cached. Run calc_func.patch_angle_calc first.')
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
@@ -43,10 +43,10 @@ def ns_pa_plot_vstime(data: dict):
     # can register 'stack_info' into data if needed. ns_time_pa_plot has modified it.
     # plot saved inside the function
     
-    # save in result_catch
+    # save in result_cache
     varname = 'sijpa' # stack_info joining patch angle
     data['SL_content'] = stack_info
-    SL_result_catch(data, varname, 'save')
+    SL_result_cache(data, varname, 'save')
     return
 
 def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: dict, data: dict):

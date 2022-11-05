@@ -1,21 +1,21 @@
 from parse_tasks import ns_construct
 import numpy as np
 from infra import TimeSeries
-from utils import SL_result_catch
+from utils import SL_result_cache
 
 def k2_calc(data:dict):
     '''
 
     '''
     varname = 'k2'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if data['SL_content']:
-        catched_result = data['SL_content']
+        cached_result = data['SL_content']
         data['SL_content'] = None
-        return catched_result
+        return cached_result
 
-    # not catched
+    # not cached
     # load ns series
     ns_series = ns_construct(data)
 

@@ -1,7 +1,7 @@
 from parse_tasks import ns_construct
 import numpy as np
 from infra import TimeSeries
-from utils import SL_result_catch
+from utils import SL_result_cache
 
 from collections import OrderedDict
 
@@ -10,14 +10,14 @@ def stacking_local_identify_calc(data:dict):
     
     '''
     varname = 'si'
-    # load data from result_catch
-    SL_result_catch(data, varname, 'load')
+    # load data from result_cache
+    SL_result_cache(data, varname, 'load')
     if data['SL_content']:
-        catched_result = data['SL_content']
+        cached_result = data['SL_content']
         data['SL_content'] = None
-        return catched_result
+        return cached_result
 
-    # not catched
+    # not cached
     # load ns series
     ns_series = ns_construct(data)
     # determine if the nanostar is RNA-based
@@ -144,9 +144,9 @@ def stacking_local_identify_calc(data:dict):
         is_stacking = True if stack_ls else False
         stacking_results[t_stamp]=(is_stacking, stack_ls)
     
-    # save in result_catch
+    # save in result_cache
     data['SL_content'] = stacking_results
-    SL_result_catch(data, varname, 'save')
+    SL_result_cache(data, varname, 'save')
     return stacking_results
 
 def generate_new_arm_base_pairs(arm,starting_loc, bp_append = None): 
