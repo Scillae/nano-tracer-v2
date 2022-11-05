@@ -1,4 +1,4 @@
-from utils.tools import get_ns_params
+from utils.tools import get_ns_params, auto_generate_summary_range
 
 stacking_options_ls = [('stacking', 'nonstacking', 'unlinked'),('no-stacking,unlinked','no-stacking,linked')] # 'stacking', 'nonstacking', 'unlinked', 'no-stacking,unlinked','no-stacking,linked', transiting?
 
@@ -7,16 +7,14 @@ def ns_pa_summary_plot(data): # entry point for generating the overall patch ang
     Plot the nanostars' means vs stds under different conditions
     :data: Expected to contain:
         data['temp_list']; data['conc_list']; data['arm_number']; data['flag_suffix']; 
-        data['conf_suffix']; data['sp_suffix']; data['ns_dims']; data['varname']; 
-        data['figure_savepath']
+        data['conf_suffix']; data['sp_suffix']; data['ns_dims']; data['figure_savepath']
     '''
     # for each nanostar to be summarized, produce a separate data dictionary
     data_package_list = auto_generate_summary_range(data)
     # iterate through all the individual nanostar
-    result_data_list = []
-    for child_data in data_package_list: # can be parallel if needed, just make ns_pa_plot return data
-        result_data_list.append(ns_pa_plot(child_data)) # add summary into child_data
-    
+    from joblib import Parallel, delayed # in Parallel
+    result_data_list = Parallel(n_jobs=12)(delayed(ns_pa_plot)(child_data) for child_data in data_package_list)
+
     # plot the result
     plt = stacking_scatter_plot(result_data_list)
     
@@ -138,27 +136,6 @@ def data_process_func(p_ang_res, data):
     t_ls = [t for t in angle_dic[(0,1)] if type(t) == int]
     ang_ls = [t_dic[t][0] for t_dic in angle_dic.values() if t_dic['is_sharing']==True for t in t_ls] # pooled for is_sharing
     return ang_ls
-
-def auto_generate_summary_range(data):
-    '''
-    :data: Expect arm_number_list, conc_list, temp_list
-    TODO: default values
-    '''
-    data_package_list = []
-    for arm_num in data['arm_number_list']:
-        for conc in data['conc_list']:
-            for temp in data['temp_list']:
-                child_data = {}
-                child_data['arm_number'] = arm_num
-                child_data['temp'] = temp
-                child_data['conc'] = conc
-                child_data['flag_suffix'] = data['flag_suffix']
-                child_data['conf_suffix'] = data['conf_suffix']
-                child_data['sp_suffix'] = data['sp_suffix']
-                child_data['ns_dims'] = data['ns_dims']
-                child_data['varname'] = data['varname']
-                data_package_list.append(child_data)
-    return data_package_list
 
 def hist_summ(var_ls, bin_num):
     '''

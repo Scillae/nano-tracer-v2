@@ -3,7 +3,7 @@ from utils.result_cache import generate_path
 from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
 import plot_tasks.ns_si_process.data_process_func
 
-def ns_pa_plot_vstime(data: dict):
+def ns_pa_vstime_plot(data: dict):
     '''
     Plot nanostar's patch angles vs time per arm pair. Raw values, Running avgs, and running rmsds are plotted.
     Single trajectory!
@@ -140,7 +140,7 @@ def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: dict, data: dict):
     chkdir(os.path.dirname(plot_path))
     plt.savefig(plot_path,dpi=400)
     plt.close()
-    return True
+    return
 
 def counting_stacking(stack_info: dict, number_stack: int, is_count_all: bool, is_reverse_select_number_stack: bool, ns_struc: dict):
     '''
@@ -184,7 +184,6 @@ def data_process_func(p_ang_res: dict, data: dict): # should be trimmed.
     '''
     Convert stored results into what suitable for plotting.
     :p_ang_res: patch angle result
-    :data: expected to have 'Arm_Pairs', 'Arm_IDs'
     '''
     arm_pairs = p_ang_res.params['Arm_Pairs']
     arm_IDs = p_ang_res.params['Arm_IDs']

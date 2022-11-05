@@ -3,13 +3,12 @@ import plot_tasks.ns_si_process.data_process_func
 import scipy.stats as stat
 import matplotlib.pyplot as plt
 
-def ns_k2_plot_heatmap(data):
+def ns_k2_heatmap_plot(data:dict):
     '''
     Plot single nanostar's oblacity vs prolacity heatmap.
     :data: Expected to contain: (WIP)
         data['temp']; data['conc']; data['arm_number']; data['flag_suffix']; 
-        data['conf_suffix']; data['sp_suffix']; data['ns_dims']; data['varname']; 
-        data['figure_savepath']
+        data['conf_suffix']; data['sp_suffix']; data['ns_dims']; data['figure_savepath']
     '''
     # retrieve result from calc_func.stacking_local_identify_calc
     varname = 'si'
@@ -37,12 +36,12 @@ def ns_k2_plot_heatmap(data):
     #### conf ends ####
 
     plot_confs = {'x_lim':x_lim, 'y_lim':y_lim, 'plot_path':plot_path, 'label':label}
-    ns_heatmap_plot(var_vals, stack_info, plot_confs, data) # plot saved inside the function
+    heatmap_single_ns_all_steps(var_vals, stack_info, plot_confs, data) # plot saved inside the function
     
     return
 
 
-def ns_heatmap_k2_plot(var_vals, stack_info, plot_confs, data):
+def heatmap_single_ns_all_steps(var_vals:dict, stack_info:dict, plot_confs:dict, data:dict):
     '''
     To be documented
     '''
@@ -58,7 +57,7 @@ def ns_heatmap_k2_plot(var_vals, stack_info, plot_confs, data):
     
     # draw heatmap
     draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plotpath)
-    return True
+    return
 
 def draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plotpath):
     '''
@@ -104,7 +103,7 @@ def draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plotpath):
     chkdir(os.path.dirname(plot_path))
     plt.savefig(os.path.splitext(plotpath)[0]+'-Heatmap'+'.png',dpi=400)    
     plt.close()
-    return True
+    return
 
 def generate_Z_layer(Z,prob,delta=0.05,is_FWHM=False):
     '''
@@ -127,3 +126,11 @@ def generate_Z_layer(Z,prob,delta=0.05,is_FWHM=False):
     # Produce Z
     Z_sub = Z*(Z>Z_threshold-delta/2)*(Z<Z_threshold+delta/2)
     return Z_sub
+
+def data_process_func(k2_ls_res, data):
+    t_ls = [i[0] for i in k2_ls_res]
+    k2_ls = [i[1] for i in k2_ls_res]
+    lbd_ls = [sorted(i[2]) for i in k2_ls_res]
+    del_ls = [(i[1]-i[0],i[2]-i[1]) for i in lbd_ls]
+    axs_ls = [sorted(zip(i[2],i[3])) for i in k2_ls_res] # [((lbds),(axes))] instead of [(axes)]
+    return {'t':t_ls, 'k2':k2_ls, 'lambdas':lbd_ls, 'deltas':del_ls, 'axes':axs_ls}

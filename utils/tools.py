@@ -97,13 +97,11 @@ def chkdir(d):
     return
 
 
-def dims_adjust(ns_dims, conf_suffix, single=True, sp_suffix=''):
+def dims_adjust(ns_dims, conf_suffix):
     """
     Adjust the ns_dims based on conf_suffix
     :param ns_dims: the dimensions of the nanostar
     :param conf_suffix: the suffix describing nanostar's configuration
-    :param single: if it's for a single nanostar
-    :param sp_suffix: special suffix
     """
     ns_dims = [20, 2, 7]
     if conf_suffix.split('_')[0] == '':
@@ -112,6 +110,36 @@ def dims_adjust(ns_dims, conf_suffix, single=True, sp_suffix=''):
         ns_dims[1] = int(conf_suffix.split('_')[1])
     else:
         raise Exception("Unknown Conformation Suffix!")
+
+def update_conf_suffix_by_number_jxn_bases(conf_suffix, number_jxn_bases):
+    if number_jxn_bases != 2:
+            return conf_suffix + f'-jun_{number_jxn_bases}'
+
+def auto_generate_summary_range(data):
+    '''
+    :data: Expect arm_number_list, conc_list, temp_list
+    TODO: default values
+    '''
+    from copy import deepcopy
+    data_package_list = []
+    for arm_number in data['arm_number_list']:
+        for number_jxn_bases in data['#jxn_bases_list']:
+            for conc in data['conc_list']:
+                for temp in data['temp_list']:
+                    conf_suffix = update_conf_suffix_by_number_jxn_bases(data['conf_suffix'], number_jxn_bases)
+                    ns_dims = deepcopy(data['ns_dims'])
+                    dims_adjust(ns_dims, conf_suffix)
+                    data_package_list.append({
+                        'arm_number' : arm_number,
+                        'temp' : temp,
+                        'conc' : conc,
+                        'flag_suffix' : data['flag_suffix'],
+                        'conf_suffix' : conf_suffix,
+                        'sp_suffix' : data['sp_suffix'],
+                        'ns_dims' : ns_dims,
+                    })
+    return data_package_list
+
 
 def data_query(data, query_vals, vals_types=None):
     default_vals = {'int': 0, 'str': '', 'dict': None, 'list': None}
