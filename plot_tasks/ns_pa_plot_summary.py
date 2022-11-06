@@ -1,4 +1,10 @@
-from utils.tools import get_ns_params, auto_generate_summary_range
+from scipy import stats
+from utils import get_ns_params, auto_generate_summary_range, SL_result_cache
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import plot_tasks.ns_pa_plot_vstime
 
 stacking_options_ls = [('stacking', 'nonstacking', 'unlinked'),('no-stacking,unlinked','no-stacking,linked')] # 'stacking', 'nonstacking', 'unlinked', 'no-stacking,unlinked','no-stacking,linked', transiting?
 
@@ -38,12 +44,17 @@ def ns_pa_hist_plot(data): # entry point for generating the patch angle histogra
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
+    # Plotting Parameter
+    x_lim = (0, 180)
+    y_lim = (0, 0.2)
+    bin_num = 36
+
     # get ready for plotting histogram
-    n,bin_edges = np.histogram(var_ls,bins = bin_num, range = x_lim)
+    n,bin_edges = np.histogram(var_vals,bins = bin_num, range = x_lim)
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
 
     # moments
-    n, m1, std, m3_s = moments_calc(n, var_ls)
+    n, m1, std, m3_s = moments_calc(n, var_vals)
     data['Summary'] = [m1, std]
     
     return
@@ -72,10 +83,10 @@ def ns_pa_plot(data):
     prop_stacking = stk_cnt/((ns_struc['arm_number']//2) * len(stack_info[(0,1)]['t'])) # divided by the maximum possible number of stack
     summ_dic = {'prop_stacking':prop_stacking} 
     for stacking_option in stacking_options_ls[0]: # angles in nanostars with stacked arm pairs
-        var_ls = create_var_ls(stacking_option,ns_struc,pa_vtime_dic,stack_info)
+        var_ls = create_var_ls(stacking_option,ns_struc,stack_info)
         summ_dic[stacking_option] = hist_summ(var_ls, 36) if var_ls is not None else None # hist_summ returns n, m1, std, m3_s of the provided distribution
     for stacking_option in stacking_options_ls[1]: # angles in nanostars without stacked arm pairs
-        var_ls = create_var_ls(stacking_option,ns_struc,pa_vtime_dic,stack_info)
+        var_ls = create_var_ls(stacking_option,ns_struc,stack_info)
         summ_dic[stacking_option] = hist_summ(var_ls, 36) if var_ls is not None else None # hist_summ returns n, m1, std, m3_s of the provided distribution
     return summ_dic
 
@@ -130,7 +141,7 @@ def data_process_func(p_ang_res, data):
     :p_ang_res: patch angle result
     :data: expected to have 'Arm_Pairs', 'Arm_IDs'
     '''
-    import plot_tasks.ns_pa_plot_vstime.data_process_func
+    # import plot_tasks.ns_pa_plot_vstime.data_process_func
     angle_dic = plot_tasks.ns_pa_plot_vstime.data_process_func(p_ang_res, data)
     # pool down the data into list
     t_ls = [t for t in angle_dic[(0,1)] if type(t) == int]
