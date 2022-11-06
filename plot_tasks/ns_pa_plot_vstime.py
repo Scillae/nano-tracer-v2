@@ -1,7 +1,11 @@
+from collections import OrderedDict
+
 import numpy as np
-from utils.result_cache import generate_path
-from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
-import plot_tasks.ns_si_process.data_process_func
+from utils import chkdir, data_query, dims_adjust, get_ns_params, generate_path, SL_result_cache
+import plot_tasks.ns_si_process
+import matplotlib.pyplot as plt
+import matplotlib
+import os
 
 def ns_pa_vstime_plot(data: dict):
     '''
@@ -12,7 +16,7 @@ def ns_pa_vstime_plot(data: dict):
     varname = 'pa'
     # remember to truncate unused unpacked values later.
     arm_number, temp, conc, sp_suffix, conf_suffix, flag_suffix, dims_ls = data_query(data, ['arm_number', 'temp', 'conc', 'sp_suffix', 'conf_suffix', 'flag_suffix', 'dims_ls'], ['int','double','double','str','str','str','ls'])
-    dims_adjust(dims_ls, conf_suffix, single, sp_suffix) # ns_dims: [arm, center, single_end] #lengths
+    dims_adjust(dims_ls, conf_suffix) # ns_dims: [arm, center, single_end] #lengths
 
     # retrieve result from calc_func.stacking_local_identify_calc
     varname = 'si'
@@ -198,8 +202,8 @@ def data_process_func(p_ang_res: dict, data: dict): # should be trimmed.
         linked_cnt = 0
         for arm_pair, (ang, vec_tp, is_linked) in ang_res_per_armpair.items():
             angle_dic[arm_pair][t_stamp] = [ang, vec_tp] # collecting patch angles of a specific arm pair
-            if 'is_linked' not in angle_dic[ia_tp].keys():
-                angle_dic[ia_tp]['is_linked'] = is_linked # log if the arm pair is linked
+            if 'is_linked' not in angle_dic[arm_pair].keys():
+                angle_dic[arm_pair]['is_linked'] = is_linked # log if the arm pair is linked
             if is_linked: # sanity check: count the total linked arm pairs in each frame
                 linked_cnt += 1
         # the number of linked arm pairs should equals to the number of arms

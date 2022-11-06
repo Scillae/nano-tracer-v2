@@ -77,6 +77,6 @@ def run_ns_pa_vstime_plot_single_shot():
 
 if __name__ == '__main__':
     run_ns_pa_plot_summary()
-    run_ns_k2_plot_batch_issue()
+    run_ns_k2_heatmap_plot_batch_issue()
     run_ns_pa_vstime_plot_batch_issue()
     run_ns_pa_vstime_plot_single_shot()
