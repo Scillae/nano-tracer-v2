@@ -53,4 +53,8 @@ def k2_calc(data:dict):
         v1, v2, v3 = e_vecs
         k2 = 1 - (27*l1*l2*l3)/((l1+l2+l3)**3)
         k2_results[t_stamp] = (k2,(l1, l2, l3),(v1, v2, v3))
+    
+    # save in result_cache
+    data['SL_content'] = k2_results
+    SL_result_cache(data, varname, 'save')
     return k2_results

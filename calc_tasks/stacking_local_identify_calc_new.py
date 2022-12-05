@@ -42,10 +42,11 @@ def stacking_local_identify_calc(data:dict):
         # detect the 1st paired bp in arm & create the mis-matched bases pool
         for ia0 in arms_IDs:
             arm0 = ns.arms[ia0]
+            shift_dic[ia0] = 0
             for i in range(data['ns_dims'][0]):
                 if check_if_bp(arm0.base_pairs[i+1][0],arm0.base_pairs[i+1][1]): # idx of base_pairs starts from 1
                     mismatch_b_ls.extend(arm0.base_pairs[i+1])
-            shift_dic[ia0] = i + 1 # stores where the arm0 'truly' start ---- excluding the mis-matched base pairs.
+                    shift_dic[ia0] = i + 1 # stores where the arm0 'truly' start ---- excluding the mis-matched base pairs.
         
 
 

@@ -1,5 +1,4 @@
 import os
-import pickle
 import os.path
 from models import Strand, Base
 from infra import TimeSeries

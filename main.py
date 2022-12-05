@@ -5,7 +5,7 @@ def generate_data_for_ns_pa_summary_plot():
         'temp_list': [20, 23, 27, 30, 40, 50], 
         'conc_list': [0.05, 0.1,0.3,0.5], 
         '#jxn_bases_list': [0, 1, 2, 5, 10],
-        'arm_number': [3, 4, 5, 6], 
+        'arm_number_list': [3, 4, 5, 6], 
         'flag_suffix': '', 
         'conf_suffix': '', 
         'sp_suffix': '', 
@@ -20,7 +20,7 @@ def generate_data_for_batch_issue_k2_heatmap_plot():
         'temp_list': [20, 23, 27, 30, 40, 50], 
         'conc_list': [0.05, 0.1,0.3,0.5], 
         '#jxn_bases_list': [0, 1, 2, 5, 10],
-        'arm_number': [3, 4, 5, 6], 
+        'arm_number_list': [3, 4, 5, 6], 
         'flag_suffix': '', 
         'conf_suffix': '', 
         'sp_suffix': '', 
@@ -34,7 +34,7 @@ def generate_data_for_batch_issue_pa_vstime_plot():
         'temp_list': [20, 23, 27, 30, 40, 50], 
         'conc_list': [0.05, 0.1,0.3,0.5], 
         '#jxn_bases_list': [0, 1, 2, 5, 10],
-        'arm_number': [3, 4, 5, 6], 
+        'arm_number_list': [3, 4, 5, 6], 
         'flag_suffix': '', 
         'conf_suffix': '', 
         'sp_suffix': '', 
@@ -72,8 +72,8 @@ def run_ns_pa_vstime_plot_batch_issue():
 
 def run_ns_pa_vstime_plot_single_shot():
     data = generate_data_for_ns_pa_vstime_plot()
-    from calc_tasks.stacking_local_identify_calc import stacking_local_identify_calc
-    stacking_local_identify_calc(data)
+    from calc_tasks.patch_angle_calc import patch_angle_calc
+    patch_angle_calc(data)
     # from plot_tasks.ns_pa_plot_vstime import ns_pa_vstime_plot
     # ns_pa_vstime_plot(data)
 

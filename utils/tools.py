@@ -104,6 +104,8 @@ def dims_adjust(ns_dims, conf_suffix):
     :param conf_suffix: the suffix describing nanostar's configuration
     """
     ns_dims = [20, 2, 7]
+    if conf_suffix == None:
+        return
     if conf_suffix.split('_')[0] == '':
         return
     if conf_suffix.split('_')[0] == '-jun':
