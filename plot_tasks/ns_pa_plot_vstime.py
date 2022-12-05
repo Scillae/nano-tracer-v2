@@ -1,7 +1,7 @@
 import numpy as np
-from utils.result_cache import generate_path
+from utils.result_cache import generate_path, SL_result_cache
 from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
-import plot_tasks.ns_si_process.data_process_func
+import plot_tasks.ns_si_process
 
 def ns_pa_vstime_plot(data: dict):
     '''
@@ -11,8 +11,8 @@ def ns_pa_vstime_plot(data: dict):
     '''
     varname = 'pa'
     # remember to truncate unused unpacked values later.
-    arm_number, temp, conc, sp_suffix, conf_suffix, flag_suffix, dims_ls = data_query(data, ['arm_number', 'temp', 'conc', 'sp_suffix', 'conf_suffix', 'flag_suffix', 'dims_ls'], ['int','double','double','str','str','str','ls'])
-    dims_adjust(dims_ls, conf_suffix, single, sp_suffix) # ns_dims: [arm, center, single_end] #lengths
+    arm_number, temp, conc, sp_suffix, conf_suffix, flag_suffix, ns_dims = data_query(data, ['arm_number', 'temp', 'conc', 'sp_suffix', 'conf_suffix', 'flag_suffix', 'ns_dims'], ['int','double','double','str','str','str','list'])
+    dims_adjust(ns_dims, conf_suffix) # ns_dims: [arm, center, single_end] #lengths
 
     # retrieve result from calc_func.stacking_local_identify_calc
     varname = 'si'

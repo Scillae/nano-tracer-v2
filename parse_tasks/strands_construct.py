@@ -1,5 +1,5 @@
 from infra import StrandConstructor
-from utils import SL_result_cache, generate_path
+from utils.result_cache import SL_result_cache, generate_path
 
 
 def strands_construct(data):

@@ -8,7 +8,7 @@ def data_process_func(stacking_res: dict, data: dict):
     :data: no dependence yet. remember to register if added later.
     '''
     # stacking_res: OrderedDict{t_stamp: is_stacking, stack_ls}
-    arms, temp, conc, sp_suffix, conf_suffix, flag_suffix, dims_ls = data
+    arms, temp, conc, sp_suffix, conf_suffix, flag_suffix, ns_dims = data
     # init
     stack_info = {}
     for ia1,ia2 in create_ia_idx_ls(arms):

@@ -77,10 +77,10 @@ def ns_pa_plot(data):
     prop_stacking = stk_cnt/((ns_struc['arm_number']//2) * len(stack_info[(0,1)]['t'])) # divided by the maximum possible number of stack
     summ_dic = {'prop_stacking':prop_stacking} 
     for stacking_option in stacking_options_ls[0]: # angles in nanostars with stacked arm pairs
-        var_ls = create_var_ls(stacking_option,ns_struc,pa_vtime_dic,stack_info)
+        var_ls = create_var_ls(stacking_option,ns_struc,stack_info)
         summ_dic[stacking_option] = hist_summ(var_ls, 36) if var_ls is not None else None # hist_summ returns n, m1, std, m3_s of the provided distribution
     for stacking_option in stacking_options_ls[1]: # angles in nanostars without stacked arm pairs
-        var_ls = create_var_ls(stacking_option,ns_struc,pa_vtime_dic,stack_info)
+        var_ls = create_var_ls(stacking_option,ns_struc,stack_info)
         summ_dic[stacking_option] = hist_summ(var_ls, 36) if var_ls is not None else None # hist_summ returns n, m1, std, m3_s of the provided distribution
     return summ_dic
 

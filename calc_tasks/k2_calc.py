@@ -1,7 +1,7 @@
 from parse_tasks import ns_construct
 import numpy as np
 from infra import TimeSeries
-from utils import SL_result_cache
+from utils.result_cache import SL_result_cache
 
 def k2_calc(data:dict):
     '''

@@ -72,8 +72,10 @@ def run_ns_pa_vstime_plot_batch_issue():
 
 def run_ns_pa_vstime_plot_single_shot():
     data = generate_data_for_ns_pa_vstime_plot()
-    from plot_tasks.ns_pa_plot_vstime import ns_pa_vstime_plot
-    ns_pa_vstime_plot(data)
+    from calc_tasks.stacking_local_identify_calc import stacking_local_identify_calc
+    stacking_local_identify_calc(data)
+    # from plot_tasks.ns_pa_plot_vstime import ns_pa_vstime_plot
+    # ns_pa_vstime_plot(data)
 
 if __name__ == '__main__':
     run_ns_pa_plot_summary()
