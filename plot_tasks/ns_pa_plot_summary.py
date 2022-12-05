@@ -1,4 +1,10 @@
-from utils.tools import get_ns_params, auto_generate_summary_range
+from scipy import stats
+from utils import get_ns_params, auto_generate_summary_range, SL_result_cache
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import plot_tasks.ns_pa_plot_vstime
 
 stacking_options_ls = [('stacking', 'nonstacking', 'unlinked'),('no-stacking,unlinked','no-stacking,linked')] # 'stacking', 'nonstacking', 'unlinked', 'no-stacking,unlinked','no-stacking,linked', transiting?
 
@@ -44,11 +50,11 @@ def ns_pa_hist_plot(data): # entry point for generating the patch angle histogra
     bin_num = 36
 
     # get ready for plotting histogram
-    n,bin_edges = np.histogram(var_ls,bins = bin_num, range = x_lim)
+    n,bin_edges = np.histogram(var_vals,bins = bin_num, range = x_lim)
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
 
     # moments
-    n, m1, std, m3_s = moments_calc(n, var_ls)
+    n, m1, std, m3_s = moments_calc(n, var_vals)
     data['Summary'] = [m1, std]
     
     return
@@ -135,7 +141,7 @@ def data_process_func(p_ang_res, data):
     :p_ang_res: patch angle result
     :data: expected to have 'Arm_Pairs', 'Arm_IDs'
     '''
-    import plot_tasks.ns_pa_plot_vstime.data_process_func
+    # import plot_tasks.ns_pa_plot_vstime.data_process_func
     angle_dic = plot_tasks.ns_pa_plot_vstime.data_process_func(p_ang_res, data)
     # pool down the data into list
     t_ls = [t for t in angle_dic[(0,1)] if type(t) == int]

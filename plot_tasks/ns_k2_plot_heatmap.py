@@ -1,7 +1,11 @@
-from utils.tools import get_ns_params
-import plot_tasks.ns_si_process.data_process_func
+from utils import get_ns_params, SL_result_cache, generate_path, chkdir, data_query
+# import plot_tasks.ns_si_process.data_process_func
+import plot_tasks.ns_si_process
 import scipy.stats as stat
 import matplotlib.pyplot as plt
+
+import numpy as np
+import os
 
 def ns_k2_heatmap_plot(data:dict):
     '''
@@ -48,7 +52,7 @@ def heatmap_single_ns_all_steps(var_vals:dict, stack_info:dict, plot_confs:dict,
     x_lim, y_lim, plot_path, label = data_query(data, ['x_lim','y_lim','plot_path','label'],['tuple','tuple','str','str'])
 
     _,_,_,_,_,_,_,ns_struc = get_ns_params(data['arm_number'])
-    var_dic = data_process_func(var_ls_results, data, vtime = True)
+    var_dic = data_process_func(var_vals, data)
 
     # load data
     lbd_axs_ls = var_dic['axes']
@@ -56,10 +60,10 @@ def heatmap_single_ns_all_steps(var_vals:dict, stack_info:dict, plot_confs:dict,
     l3_arr = np.array([conf_lbd[2][0]/conf_lbd[1][0] for conf_lbd in lbd_axs_ls])
     
     # draw heatmap
-    draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plotpath)
+    draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plot_path)
     return
 
-def draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plotpath):
+def draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plot_path):
     '''
     (Truncated Version) Draw heatmap.
     '''
@@ -101,7 +105,7 @@ def draw_k2_heatmap(l2_arr, l3_arr, x_lim, y_lim, stack_info, plotpath):
     ax.tick_params(bottom=True,top=True,left=True,right=True,direction='in',which='minor')
     
     chkdir(os.path.dirname(plot_path))
-    plt.savefig(os.path.splitext(plotpath)[0]+'-Heatmap'+'.png',dpi=400)    
+    plt.savefig(os.path.splitext(plot_path)[0]+'-Heatmap'+'.png',dpi=400)
     plt.close()
     return
 

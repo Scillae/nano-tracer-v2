@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import numpy as np
 from utils.result_cache import generate_path, SL_result_cache
 from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
@@ -198,8 +200,8 @@ def data_process_func(p_ang_res: dict, data: dict): # should be trimmed.
         linked_cnt = 0
         for arm_pair, (ang, vec_tp, is_linked) in ang_res_per_armpair.items():
             angle_dic[arm_pair][t_stamp] = [ang, vec_tp] # collecting patch angles of a specific arm pair
-            if 'is_linked' not in angle_dic[ia_tp].keys():
-                angle_dic[ia_tp]['is_linked'] = is_linked # log if the arm pair is linked
+            if 'is_linked' not in angle_dic[arm_pair].keys():
+                angle_dic[arm_pair]['is_linked'] = is_linked # log if the arm pair is linked
             if is_linked: # sanity check: count the total linked arm pairs in each frame
                 linked_cnt += 1
         # the number of linked arm pairs should equals to the number of arms
