@@ -47,8 +47,6 @@ def stacking_local_identify_calc(data:dict):
                 if check_if_bp(arm0.base_pairs[i+1][0],arm0.base_pairs[i+1][1]): # idx of base_pairs starts from 1
                     mismatch_b_ls.extend(arm0.base_pairs[i+1])
                     shift_dic[ia0] = i + 1 # stores where the arm0 'truly' start ---- excluding the mis-matched base pairs.
-        
-
 
 
 
@@ -121,6 +119,7 @@ def stacking_local_identify_calc(data:dict):
         ptt_aps = [] # [(arm1,arm2)]
         arms_IDs = list(ns.arms.keys())
         for idx_0, ia0 in enumerate(arms_IDs):
+            arm0 = ns.arms[ia0]
             arm0_dir = get_arm_dir(ns.arms[ia0], is_RNA) # get the arm's direction
             for idx_1 in range(idx_0+1, len(arms_IDs)):
                 arm1_dir = get_arm_dir(ns.arms[arms_IDs[idx_1]],is_RNA)
