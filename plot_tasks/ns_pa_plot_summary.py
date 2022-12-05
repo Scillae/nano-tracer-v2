@@ -38,6 +38,11 @@ def ns_pa_hist_plot(data): # entry point for generating the patch angle histogra
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
+    # Plotting Parameter
+    x_lim = (0,180)
+    y_lim = (0,0.2)
+    bin_num = 36
+
     # get ready for plotting histogram
     n,bin_edges = np.histogram(var_ls,bins = bin_num, range = x_lim)
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
