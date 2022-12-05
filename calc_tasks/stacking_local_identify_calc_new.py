@@ -53,7 +53,6 @@ def stacking_local_identify_calc(data:dict):
 
 
 
-
         # pair up the mis-matched bps if possible; it NO LONGER follow the topology of the nanostar! Only depending on the bases' standalone characteristics
         if mismatch_b_ls: # empty is False; enter here if not empty
             mismatch_bp_ls = [] # where the 'paired' mis-matched bps are stored
