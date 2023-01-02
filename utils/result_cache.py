@@ -48,7 +48,7 @@ def generate_path(data: dict, path_name: str):
     if flag_suffix in ['-cenT', '-cenToxDNA2']:
         top_path = f'D:/Streaming-tmp/ox-sync/simul-inputs-{arms}arms{conf_suffix}{flag_suffix}/{arms}arm-rods{conf_suffix}-cenT.top'
     # savepath = f'data/result_cache_files/{flag_suffix}/{arms}arms{conf_suffix}/{loose_lbl}/{label}'
-    savepath = f'data/result_cache_files{flag_suffix if flag_suffix else "/"}{arms}arms{conf_suffix}/{loose_lbl}/{label}'
+    savepath = f'data/result_cache_files{flag_suffix+"/" if flag_suffix else "/"}{arms}arms{conf_suffix}/{loose_lbl}/{label}'
     if varname != 0:
         plotpath = f'results/{arms}arms{conf_suffix}{flag_suffix}/{varname}/{varname}_hist-{label}.png'
         var_path = f'{savepath}.{varname}'

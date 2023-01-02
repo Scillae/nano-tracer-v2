@@ -20,7 +20,7 @@ class NanoStar:
         strands_editing = copy.deepcopy(strands)  # avoid modification to the ref var.
         self.strands = strands
         self.arms = self.binding(strands_editing, ns_dims, box_dim)
-        self.center = self.center_gen(strands_editing,
+        self.center = self.center_gen(self.strands,
                                       ns_dims)  # PBCC performed in self.binding, so self.center must goes afterwards. Also, 'strands' is modified by self.binding, so use self.strands here.
         self.box_dim = box_dim
         self.dims = ns_dims
@@ -151,7 +151,7 @@ class NanoStar:
         if is_checking_pbcc:
             CoM_pos = self.get_CoM_pos()
             criteria = (ns_dims[0] + ns_dims[1]) / (
-                    20 - binding_location) * 8.3 * 1.2  # 20 bp : ~8.3 SU. Setting tolerance as 20%
+                    20 - binding_location) * 8.3 * 1.3  # 20 bp : ~8.3 SU. Setting tolerance as 30% because of simul-inputs-6arms-jun_10-oxrna2/20C-0.1M-GPU, was 20%
             bp_ls = [
                 list(strands[idx].base_sequence.values())[-1 - ns_dims[2] - ns_dims[0] // binding_location] if dist(
                     np.array(list(strands[idx].base_sequence.values())[

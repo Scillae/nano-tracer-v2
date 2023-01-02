@@ -115,7 +115,9 @@ def dims_adjust(ns_dims, conf_suffix):
 
 def update_conf_suffix_by_number_jxn_bases(conf_suffix, number_jxn_bases):
     if number_jxn_bases != 2:
-            return conf_suffix + f'-jun_{number_jxn_bases}'
+        return conf_suffix + f'-jun_{number_jxn_bases}'
+    else:
+        return conf_suffix
 
 def auto_generate_summary_range(data):
     '''
@@ -131,7 +133,7 @@ def auto_generate_summary_range(data):
                     conf_suffix = update_conf_suffix_by_number_jxn_bases(data['conf_suffix'], number_jxn_bases)
                     ns_dims = deepcopy(data['ns_dims'])
                     dims_adjust(ns_dims, conf_suffix)
-                    data_package_list.append({
+                    child_data = {
                         'arm_number' : arm_number,
                         'temp' : temp,
                         'conc' : conc,
@@ -139,12 +141,15 @@ def auto_generate_summary_range(data):
                         'conf_suffix' : conf_suffix,
                         'sp_suffix' : data['sp_suffix'],
                         'ns_dims' : ns_dims,
-                    })
+                        'RNA': data['RNA'],
+                        'Central_base_type' : data['Central_base_type'],
+                    }
+                    data_package_list.append(generate_flag_suffix(child_data))
     return data_package_list
 
 
 def data_query(data, query_vals, vals_types=None):
-    default_vals = {'int': 0, 'str': '', 'dict': None, 'list': None}
+    default_vals = {'int': 0, 'float':0.0, 'str': '', 'dict': None, 'list': None, 'tuple': None}
     return_vals = []
     for i, val_name in enumerate(query_vals):
         if val_name in data:
@@ -212,3 +217,15 @@ def get_ns_params(arm_num: int):
         assert 0==1    
     assert time_window_width % 2 == 1 # must be odd
     return time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, nonstacking_min_length, nonstacking_crit_ang, nonstacking_crit_rmsd, ns_struc
+
+
+def generate_flag_suffix(data):
+    if data['RNA'] == True and data['Central_base_type'] == 'A':
+        data['flag_suffix'] = '-oxrna2'
+    elif data['RNA'] == False and data['Central_base_type'] == 'T':
+        data['flag_suffix'] = '-cenToxDNA2'
+    elif data['RNA'] == True and data['Central_base_type'] == 'T':
+        data['flag_suffix'] = '-cenU'
+    else:
+        data['flag_suffix'] = ''
+    return data

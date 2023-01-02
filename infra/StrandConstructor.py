@@ -120,7 +120,7 @@ class StrandConstructor:
                     print(
                         f'    id: {i.strand_id}, base_count: {len(i.base_sequence)}')
             res = self.read_single_strand()
-        self.time_series.params['box_dim'] = self.box
+        self.time_series.params['box_dim'] = self.box[0] # assuming a cube box
         self.time_series.params['energy'] = self.energy
         print('Reach end of file.')
         print(f'Total time series length: {len(self.time_series)}')

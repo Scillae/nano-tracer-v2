@@ -1,7 +1,5 @@
 import numpy as np
-
-from plot_tasks.ns_pa_plot_vstime import create_ia_idx_ls
-
+from utils.tools import data_query
 
 def data_process_func(stacking_res: dict, data: dict):
     '''
@@ -11,7 +9,7 @@ def data_process_func(stacking_res: dict, data: dict):
     :data: no dependence yet. remember to register if added later.
     '''
     # stacking_res: OrderedDict{t_stamp: is_stacking, stack_ls}
-    arms, temp, conc, sp_suffix, conf_suffix, flag_suffix, ns_dims = data
+    arms, temp, conc, sp_suffix, conf_suffix, flag_suffix, ns_dims = data_query(data, ['arm_number', 'temp', 'conc', 'sp_suffix', 'conf_suffix', 'flag_suffix', 'ns_dims'], ['int', 'float', 'float', 'str', 'str', 'str', 'list'])
     # init
     stack_info = {}
     for ia1,ia2 in create_ia_idx_ls(arms):
@@ -39,3 +37,6 @@ def data_process_func(stacking_res: dict, data: dict):
         stack_info[(ia1,ia2)]['bool'] = r_ls
         stack_info[(ia1,ia2)]['t'] = list(stacking_res) # filling in time indices as well
     return stack_info
+
+def create_ia_idx_ls(arm_num: int):
+    return [(ia1,ia2) for ia1 in range(arm_num) for ia2 in range(ia1+1,arm_num)]

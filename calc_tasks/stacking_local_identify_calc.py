@@ -7,7 +7,8 @@ from collections import OrderedDict
 
 def stacking_local_identify_calc(data:dict):
     '''
-    
+    Temporary version.
+    Implementing the original method.
     '''
     varname = 'si'
     # load data from result_cache
@@ -21,8 +22,10 @@ def stacking_local_identify_calc(data:dict):
     # load ns series
     ns_series = ns_construct(data)
     # determine if the nanostar is RNA-based
-    is_RNA = bool('RNA' in data)
-    
+    is_RNA = data['RNA']
+
+
+
     from copy import deepcopy
     stacking_dict = OrderedDict() # OrderedDict{t_stamp: is_stacking, stack_ls}
     for t_stamp, ns in ns_series.items():
@@ -195,6 +198,10 @@ def stacking_local_identify_calc(data:dict):
             is_stacking = True
             stacking_dict[t_stamp]=(is_stacking, stack_ls)
             continue
+    
+    # save in result_cache
+    data['SL_content'] = stacking_dict
+    SL_result_cache(data, varname, 'save') 
     return stacking_dict
 
 def generate_new_arm_base_pairs(arm,starting_loc, bp_append = None):
@@ -249,7 +256,7 @@ def get_arm_dir(arm,is_RNA):
         # ensuring orthogonality
         fbp_CoM_v = v_normalize(np.cross(np.cross(arm_dir,fbp_CoM_v),arm_dir))
         # rotate by 19deg
-        arm_dir = np.cos(np.radians(19))*arm_dir + np.sin(np.radians(19))*fbp_CoM_v
+        arm_dir = np.cos(np.radians(-19))*arm_dir + np.sin(np.radians(-19))*fbp_CoM_v
     return arm_dir
 
 def CoM_bp(bp):

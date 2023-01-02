@@ -19,7 +19,10 @@ def ns_k2_heatmap_plot(data:dict):
     # load data from result_cache
     SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not cached. Run calc_tasks.stacking_local_identify_calc first.')
+        from calc_tasks.stacking_local_identify_calc import stacking_local_identify_calc as slic
+        slic(data)
+        SL_result_cache(data, varname, 'load')
+        # raise Exception('The results trying to be plotted is not cached. Run calc_tasks.stacking_local_identify_calc first.')
     stack_info = plot_tasks.ns_si_process.data_process_func(data['SL_content'], data)
     data['SL_content'] = None
     
@@ -28,7 +31,10 @@ def ns_k2_heatmap_plot(data:dict):
     # load data from result_cache
     SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not cached. Run calc_tasks.k2_calc first.')
+        from calc_tasks.k2_calc import k2_calc as k2c
+        k2c(data)
+        SL_result_cache(data, varname, 'load')
+        # raise Exception('The results trying to be plotted is not cached. Run calc_tasks.k2_calc first.')
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
     
@@ -49,7 +55,7 @@ def heatmap_single_ns_all_steps(var_vals:dict, stack_info:dict, plot_confs:dict,
     '''
     To be documented
     '''
-    x_lim, y_lim, plot_path, label = data_query(data, ['x_lim','y_lim','plot_path','label'],['tuple','tuple','str','str'])
+    x_lim, y_lim, plot_path, label = data_query(plot_confs, ['x_lim','y_lim','plot_path','label'],['tuple','tuple','str','str'])
 
     _,_,_,_,_,_,_,ns_struc = get_ns_params(data['arm_number'])
     var_dic = data_process_func(var_vals, data)
@@ -132,9 +138,9 @@ def generate_Z_layer(Z,prob,delta=0.05,is_FWHM=False):
     return Z_sub
 
 def data_process_func(k2_ls_res, data):
-    t_ls = [i[0] for i in k2_ls_res]
-    k2_ls = [i[1] for i in k2_ls_res]
-    lbd_ls = [sorted(i[2]) for i in k2_ls_res]
+    t_ls = [i for i in k2_ls_res]
+    k2_ls = [i[0] for i in k2_ls_res.values()]
+    lbd_ls = [sorted(i[1]) for i in k2_ls_res.values()]
     del_ls = [(i[1]-i[0],i[2]-i[1]) for i in lbd_ls]
-    axs_ls = [sorted(zip(i[2],i[3])) for i in k2_ls_res] # [((lbds),(axes))] instead of [(axes)]
+    axs_ls = [sorted(zip(i[1],i[2])) for i in k2_ls_res.values()] # [((lbds),(axes))] instead of [(axes)]
     return {'t':t_ls, 'k2':k2_ls, 'lambdas':lbd_ls, 'deltas':del_ls, 'axes':axs_ls}

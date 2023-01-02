@@ -1,5 +1,7 @@
 from collections import OrderedDict
-
+import matplotlib
+import os
+from matplotlib import pyplot as plt
 import numpy as np
 from utils.result_cache import generate_path, SL_result_cache
 from utils.tools import chkdir, data_query, dims_adjust, get_ns_params
@@ -13,7 +15,7 @@ def ns_pa_vstime_plot(data: dict):
     '''
     varname = 'pa'
     # remember to truncate unused unpacked values later.
-    arm_number, temp, conc, sp_suffix, conf_suffix, flag_suffix, ns_dims = data_query(data, ['arm_number', 'temp', 'conc', 'sp_suffix', 'conf_suffix', 'flag_suffix', 'ns_dims'], ['int','double','double','str','str','str','list'])
+    arm_number, temp, conc, sp_suffix, conf_suffix, flag_suffix, ns_dims = data_query(data, ['arm_number', 'temp', 'conc', 'sp_suffix', 'conf_suffix', 'flag_suffix', 'ns_dims'], ['int','float','float','str','str','str','list'])
     dims_adjust(ns_dims, conf_suffix) # ns_dims: [arm, center, single_end] #lengths
 
     # retrieve result from calc_func.stacking_local_identify_calc
@@ -21,7 +23,10 @@ def ns_pa_vstime_plot(data: dict):
     # load data from result_cache
     SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not cached. Run calc_tasks.stacking_local_identify_calc first.')
+        from calc_tasks.stacking_local_identify_calc import stacking_local_identify_calc as slic
+        slic(data)
+        SL_result_cache(data, varname, 'load')
+        # raise Exception('The results trying to be plotted is not cached. Run calc_tasks.stacking_local_identify_calc first.')
     stack_info = plot_tasks.ns_si_process.data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
@@ -30,7 +35,10 @@ def ns_pa_vstime_plot(data: dict):
     # load data from result_cache
     SL_result_cache(data, varname, 'load')
     if not data['SL_content']:
-        raise Exception('The results trying to be plotted is not cached. Run calc_func.patch_angle_calc first.')
+        from calc_tasks.patch_angle_calc import patch_angle_calc as pac
+        pac(data)
+        SL_result_cache(data, varname, 'load')
+        # raise Exception('The results trying to be plotted is not cached. Run calc_func.patch_angle_calc first.')
     var_vals = data_process_func(data['SL_content'], data)
     data['SL_content'] = None
 
@@ -60,7 +68,7 @@ def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: dict, data: dict):
     :data: in which the descriptions of nanostars (trajectory) are stored. NOT the data to be plotted.
     '''
     # unpack configurations & obtain parameters
-    x_var, plot_path, label = data_query(data, ['x_var','plot_path','label'],['str','str','str'])
+    x_var, plot_path, label = data_query(plot_confs, ['x_var','plot_path','label'],['str','str','str'])
     time_window_width, stacking_min_length, stacking_crit_ang, stacking_crit_rmsd, _, _, _, ns_struc = get_ns_params(int(label[0]))
     
     # subplots layout
@@ -70,7 +78,7 @@ def ns_pa_plot(var_vals: dict, stack_info: dict, plot_confs: dict, data: dict):
     axs = gs.subplots(sharex='col')
     
     # plot running avg & rmsd
-    for i, (ia1,ia2), ang_vs_time in enumerate(var_vals.items()): # ang_vs_time: {time:ang}
+    for i, ((ia1,ia2), ang_vs_time) in enumerate(var_vals.items()): # ang_vs_time: {time:ang}
         # i: loop of arm pairs.
         # colorcode the linked & unlinked
         if (ia1,ia2) in ns_struc['linked_PA']:
@@ -212,5 +220,3 @@ def data_process_func(p_ang_res: dict, data: dict): # should be trimmed.
     print(f'Total time steps dropped: {len(drop_t_ls)}')
     return angle_dic
 
-def create_ia_idx_ls(arm_num: int):
-    return [(ia1,ia2) for ia1 in range(arm_num) for ia2 in range(ia1+1,arm_num)]

@@ -10,10 +10,12 @@ def batch_issue_k2_heatmap(data:dict): # entry point for generating the overall 
     # for each nanostar to be summarized, produce a separate data dictionary
     data_package_list = auto_generate_summary_range(data)
     # iterate through all the individual nanostar
-    from joblib import Parallel, delayed # in Parallel
+    # from joblib import Parallel, delayed # in Parallel
+    # from plot_tasks.ns_k2_plot_heatmap import ns_k2_heatmap_plot
+    # _ = Parallel(n_jobs=12)(delayed(ns_k2_heatmap_plot)(child_data) for child_data in data_package_list)
     from plot_tasks.ns_k2_plot_heatmap import ns_k2_heatmap_plot
-    _ = Parallel(n_jobs=12)(delayed(ns_k2_heatmap_plot)(child_data) for child_data in data_package_list)
-    
+    for child_data in data_package_list:
+        ns_k2_heatmap_plot(child_data)
     return
 
 
@@ -27,8 +29,10 @@ def batch_issue_pa_vstime(data): # entry point for generating the overall patch 
     # for each nanostar to be summarized, produce a separate data dictionary
     data_package_list = auto_generate_summary_range(data)
     # iterate through all the individual nanostar
-    from joblib import Parallel, delayed # in Parallel
+    # from joblib import Parallel, delayed # in Parallel
+    # from plot_tasks.ns_pa_plot_vstime import ns_pa_vstime_plot
+    # _ = Parallel(n_jobs=12)(delayed(ns_pa_vstime_plot)(child_data) for child_data in data_package_list)
     from plot_tasks.ns_pa_plot_vstime import ns_pa_vstime_plot
-    _ = Parallel(n_jobs=12)(delayed(ns_pa_vstime_plot)(child_data) for child_data in data_package_list)
-    
+    for child_data in data_package_list:
+        ns_pa_vstime_plot(child_data)
     return
